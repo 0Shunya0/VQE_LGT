@@ -7,9 +7,11 @@ crossings between different flavor-occupation sectors, so they show up as
 near-integer jumps in <N_0> at exactly the same K, independent of the slope
 estimate). Then compare against what boundary_K(N) actually returns.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import numpy as np
 
-import schwinger_core as core
+import schwinger.core as core
 
 X = 16.0
 CONV = "nu0only"

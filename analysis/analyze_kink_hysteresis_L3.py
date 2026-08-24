@@ -8,12 +8,14 @@ transition region (parameter continuation cannot cross a first-order
 boundary, so a one-directional sweep's "monotonicity gate" was never a fair
 test across that region -- this is the fix).
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
 import numpy as np
 import pandas as pd
 
-import schwinger_core as core
+import schwinger.core as core
 
 RESULTS_DIR = "results"
 P = 0.01

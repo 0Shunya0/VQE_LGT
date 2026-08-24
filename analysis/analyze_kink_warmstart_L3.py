@@ -17,12 +17,14 @@ Checks, in order:
   4. Only if 1-3 pass: full integrated-slope-drop analysis.
   5. Warm-start win rate per sweep.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
 import numpy as np
 import pandas as pd
 
-import schwinger_core as core
+import schwinger.core as core
 
 RESULTS_DIR = "results"
 P = 0.01

@@ -76,12 +76,14 @@ is now superseded by Bug 4 above, kept only for the historical record):
          K values noisy_N4_spot.csv used, so the verdict now rests on three
          matched rows, not one.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
 import numpy as np
 import pandas as pd
 
-import schwinger_core as core
+import schwinger.core as core
 
 RESULTS_DIR = "results"
 P_REF = 0.01  # representative p for the headline in-loop-vs-post-hoc comparison
