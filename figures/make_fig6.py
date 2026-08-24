@@ -4,13 +4,15 @@ added alongside the existing exact / post-hoc-noisy / ZNE curves. Same style
 as schwinger_vqe_paper_final.ipynb's Figure 6 cell: two panels, (a)/(b) panel
 labels only, no per-panel titles beyond that, no suptitle.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import schwinger_core as core
+import schwinger.core as core
 
 RESULTS_DIR = "results"
 FIG_DIR = "final_figs"

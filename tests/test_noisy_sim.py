@@ -13,8 +13,8 @@ faster backend can be picked for the production sweeps.
 import time
 import numpy as np
 
-import schwinger_core as core
-import noisy_sim as ns
+import schwinger.core as core
+import reference_noisy_sim as ns
 
 
 def statevector_check():

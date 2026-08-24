@@ -12,9 +12,9 @@ Validation of qiskit_backend.NoisyEvaluator:
 """
 import numpy as np
 
-import schwinger_core as core
-import noisy_sim as ns
-import qiskit_backend as qb
+import schwinger.core as core
+import reference_noisy_sim as ns
+import schwinger.backend as qb
 
 
 def check_spam_channel_has_effect():
