@@ -9,6 +9,8 @@ N=3, L=2, GI, p=0.01, K = linspace(4.0, 7.0, 13) (dK=0.25), 8 restarts,
 maxiter 2000. Distinct SEED_BASE from run_exp1.py/run_exp2.py/run_exp3.py so
 seeds cannot collide with any existing run.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
@@ -17,8 +19,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 3, 2, 2
 X = 16.0

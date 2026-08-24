@@ -1,10 +1,12 @@
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import sys, os, time
 os.environ["OMP_NUM_THREADS"]="1"
 os.environ["MKL_NUM_THREADS"]="1"
 os.environ["OPENBLAS_NUM_THREADS"]="1"
 import numpy as np
-import schwinger_core as core
-import qiskit_backend as qb
+import schwinger.core as core
+import schwinger.backend as qb
 from scipy.optimize import minimize
 
 seed = int(sys.argv[1])

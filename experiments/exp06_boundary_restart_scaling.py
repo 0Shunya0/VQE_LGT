@@ -10,14 +10,16 @@ one of the 32 per-restart final energies (not just the best), in the order
 COBYLA restarts were actually run, so restart-to-restart scatter and
 restarts-to-plateau can both be read off the CSV afterward.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 3, 2, 2
 X = 16.0

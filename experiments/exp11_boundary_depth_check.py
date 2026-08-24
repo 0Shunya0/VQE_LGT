@@ -12,6 +12,8 @@ results/boundary_restart_scaling_N3.csv with an added "L" column -- the
 existing L=2 rows are rewritten with L=2 filled in (they only ever used L=2),
 then the new L=3/L=4 rows are appended in the same schema.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
@@ -20,7 +22,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import pandas as pd
 
-from parallel_worker import run_cell_worker
+from schwinger.parallel_worker import run_cell_worker
 
 N, F = 3, 2
 X = 16.0

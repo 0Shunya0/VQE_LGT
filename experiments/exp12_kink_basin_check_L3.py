@@ -24,6 +24,8 @@ restarts, maxiter=4000). Nothing is deleted; downstream analysis prefers
 'basin64' rows for K in {5.25,5.50,5.75} and falls back to 'dense8'
 everywhere else.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
@@ -32,8 +34,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import pandas as pd
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 3, 2, 3
 X = 16.0

@@ -20,14 +20,16 @@ K=0. The 3.2/6.4 rows stay in the CSV as the corrected-boundary points with
 no noisy counterpart; see results/SUMMARY.md for how the two groups are
 presented.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 4, 2, 5
 X = 16.0

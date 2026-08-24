@@ -10,6 +10,8 @@ K_vals = np.linspace(-16, 16, 33), reused exactly). p in {0.005,0.01,0.02,0.05}.
 Checkpoints after every completed (K,p) cell. Prints a runtime estimate after
 the first batch of cells completes and before the rest of the sweep.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
@@ -18,8 +20,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 3, 2, 2
 X = 16.0

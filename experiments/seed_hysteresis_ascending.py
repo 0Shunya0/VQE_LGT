@@ -4,11 +4,13 @@ Fast, synchronous step: copy the already-complete ascending warm-start sweep
 hysteresis CSVs with direction='up' added. Run once before launching the
 descending passes (run_kink_hysteresis_L3_noiseless.py / _noisy.py).
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
 import pandas as pd
 
-from kink_warmstart_core import CSV_FIELDS, RESULTS_DIR
+from schwinger.kink_warmstart_core import CSV_FIELDS, RESULTS_DIR
 
 SOURCE = {
     "noiseless": os.path.join(RESULTS_DIR, "kink_warmstart_N3_L3_noiseless.csv"),

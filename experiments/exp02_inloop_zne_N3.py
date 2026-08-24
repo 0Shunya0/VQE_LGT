@@ -12,6 +12,8 @@ best-of-8 energies per cell:
     points) -- the lambda->0 limit (a+b) is the "residual floor" once the
     depolarizing part is divided out, comparable to schwinger_core.zne_exponential.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import json
 import os
@@ -21,8 +23,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 import numpy as np
 from scipy.optimize import minimize as spminimize
 
-import schwinger_core as core
-from parallel_worker import run_cell_worker
+import schwinger.core as core
+from schwinger.parallel_worker import run_cell_worker
 
 N, F, L = 3, 2, 2
 X = 16.0

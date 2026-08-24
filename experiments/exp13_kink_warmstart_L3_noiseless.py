@@ -1,7 +1,9 @@
 """Sweep C: warm-start continuation, N=3, L=3, GI, p=0, eps=0."""
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import os
 
-from kink_warmstart_core import run_warmstart_sweep, RESULTS_DIR
+from schwinger.kink_warmstart_core import run_warmstart_sweep, RESULTS_DIR
 
 CSV_PATH = os.path.join(RESULTS_DIR, "kink_warmstart_N3_L3_noiseless.csv")
 SEED_BASE = 130000  # distinct from every prior sweep (10000..120000)

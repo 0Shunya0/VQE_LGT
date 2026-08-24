@@ -11,12 +11,14 @@ schwinger_core.run_vqe uses build_H_full, not the sector-projected
 Hamiltonian) the cost is <psi|H_full|psi> on the full 2**nq state via
 hw_efficient_ansatz, instead of GI's sector-projected _energy_sector.
 """
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 import csv
 import os
 
 import numpy as np
 
-import schwinger_core as core
+import schwinger.core as core
 
 RESULTS_DIR = "results"
 CSV_PATH = os.path.join(RESULTS_DIR, "gradvar_hw.csv")
