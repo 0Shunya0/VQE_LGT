@@ -40,7 +40,7 @@ from qiskit.quantum_info import Operator
 from qiskit_aer import AerSimulator
 from qiskit_aer.noise import NoiseModel, depolarizing_error, pauli_error
 
-import schwinger_core as core
+import schwinger.core as core
 
 
 def qk(q, nq):

@@ -9,8 +9,8 @@ import time
 import numpy as np
 from scipy.optimize import minimize
 
-import schwinger_core as core
-import qiskit_backend as qb
+import schwinger.core as core
+import schwinger.backend as qb
 
 COBYLA_OPTIONS = {"rhobeg": 0.5}  # maxiter set per call, matching schwinger_core's pattern
 

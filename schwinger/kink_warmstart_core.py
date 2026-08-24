@@ -26,7 +26,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
 
-from warmstart_worker import run_single_restart
+from schwinger.warmstart_worker import run_single_restart
 
 RESULTS_DIR = "results"
 N, F, L = 3, 2, 3

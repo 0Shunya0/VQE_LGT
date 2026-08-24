@@ -615,12 +615,52 @@ def zne_exponential(E0, Emix, p, ncx, spam=SPAM_DEFAULT, lambdas=(1, 2, 3, 4, 5)
     return float(a + b)          # E(lambda=0) = a + b c^0, the zero-noise limit
 
 
-def boundary_K(N=3, x=16.0, convention=CONVENTION_DEFAULT, Kmax=8.0, npts=161):
-    """Locate the first-order phase boundary as the largest jump in dE/dK."""
+def boundary_K(N=3, x=16.0, convention=CONVENTION_DEFAULT, Kmax=8.0, npts=161,
+               all_crossings=False):
+    """Locate the first-order phase boundary.
+
+    Bug fix (see results/boundary_check.md): the original implementation
+    returned Kv[1 + argmax(|diff(dE/dK)|)] -- the location of the SINGLE
+    LARGEST slope discontinuity. That assumption silently breaks for N=4:
+    every unit increase in the flavor-0 occupation <N_0> changes dE/dK by
+    the same fixed amount (each site contributes the same -2*sqrt(x) slope),
+    so N=4's two level crossings (<N_0>: 2->3 at K~2.5, and 3->4 at K~6.4)
+    produce EXACTLY equal slope jumps (4.000000, bit-for-bit identical, not
+    just numerically close). np.argmax breaks that tie by returning the
+    FIRST maximum, so boundary_K(N=4) silently returned the non-terminal
+    K~2.5 crossing instead of the terminal K~6.4 one that continues the
+    N=2 (3.95) / N=3 (5.6) trend. N=2 and N=3 never hit this because they
+    only have one crossing each in the scanned range.
+
+    Fix: return the TERMINAL crossing (the one where the ground state
+    reaches its saturating flavor-0 occupation, N_0 = N), found directly via
+    <N_0> level crossings rather than the slope-jump proxy, since a level
+    crossing IS an <N_0> jump (independent of the accidental degeneracy in
+    slope-jump size that broke the old proxy). Verified: N=2 -> 3.95,
+    N=3 -> 5.60, N=4 -> 6.40 (matches results/boundary_check.md exactly).
+
+    all_crossings=True returns every crossing found as a list of
+    (K, N0_before, N0_after) tuples, not just the terminal one -- e.g. for
+    N=4, [(2.5, 2.0, 3.0), (6.4, 3.0, 4.0)].
+    """
     Kv = np.linspace(0, Kmax, npts)
-    E = np.array([exact_and_mix(N, k, x, convention)[0] for k in Kv])
-    dE = np.gradient(E, Kv)
-    return float(Kv[1 + int(np.argmax(np.abs(np.diff(dE))))])
+    Q_tot, Q2, N0_op, N1_op = build_operators(N, F=2)
+    N0v = np.zeros(npts)
+    for i, K in enumerate(Kv):
+        _, psi = exact_ground_state_full(x, float(K), N, F=2, convention=convention)
+        N0v[i] = float(np.real(psi.conj() @ N0_op @ psi))
+
+    d = np.abs(np.diff(N0v))
+    idxs = np.where(d > 0.3)[0]  # genuine level crossings, not numerical noise
+    crossings = [(float(Kv[i + 1]), float(round(N0v[i])), float(round(N0v[i + 1])))
+                 for i in idxs]
+
+    if all_crossings:
+        return crossings
+    if not crossings:
+        raise RuntimeError(f"boundary_K(N={N}): no <N_0> level crossing found in K in [0,{Kmax}]")
+    terminal = [c for c in crossings if c[2] >= N]
+    return (terminal[0] if terminal else crossings[-1])[0]
 
 
 # ===== shotnoise.py =====
