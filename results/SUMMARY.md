@@ -9,7 +9,48 @@ analytic contraction, unchanged from the existing driver.
 
 ## Corrections
 
-### Round 6 (this version)
+### Round 7 (this version)
+
+1. **The Round 6 baseline-adjusted suppression, -27.9%, is WITHDRAWN.** It
+   was obtained by subtracting `(1-w_eff)*dE_mix/dK` (3.212) from the raw
+   noisy post-transition slope (0.961) and forming a kink from the adjusted
+   slope. That is the same depolarizing-mixing correction as the
+   retained-fraction solve (item 2 below), applied a SECOND time on top of
+   the in-loop training that already absorbed it -- double-counting. It
+   drives the adjusted post-transition slope to -2.25, which is unphysical
+   (the exact and mixed references both increase with K on that branch, so
+   nothing physical produces a negative slope there). Per the standing rule,
+   the figure is annotated here, not deleted: it remains in Round 6's entry
+   below and its computation is kept (unpromoted) in
+   `analyze_kink_hysteresis_L3.py`'s `kink_and_baseline`. The Q2 headline no
+   longer carries it.
+
+2. **The retained-fraction solve supersedes it, and is what the paper
+   reports (Section VI C).** The in-loop slope on each branch is modelled as
+   a mixture ON THE SLOPES:
+   `dE_inloop/dK = w_eff*(dE_exact/dK) + (1-w_eff)*(dE_mix/dK)`, solved for
+   `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)`.
+   `dE_mix/dK` is the third leg (12.0 at N=3, computed via
+   `schwinger_core.exact_and_mix`, not hardcoded); it is what makes the
+   saturated branch informative rather than a divide-by-zero, since
+   `dE_mix/dK` is nonzero exactly where `dE_exact/dK` is flat. Result:
+   **ordered branch w_eff = 1.005 (100.5%), saturated branch w_eff = 0.920**,
+   both in [0.91, 1.02] (the bound is not the tighter [0.92, 1.01] because
+   the saturated branch is 0.91992, just under a nominal 0.92, and the
+   ordered branch is genuinely above 1) -- the in-loop-trained noisy
+   branches retain essentially the full exact slope, far above the
+   passive-mixing w_eff = 0.7323. This
+   unblocks `test_reproduce_paper_numbers.py::test_retained_fraction_both_branches`
+   (previously `xfail`: the formula was never in the codebase, and the two
+   definitions tried in Round 6 -- a direct E_noisy-vs-E_exact least-squares
+   solve, and a plain E_noisy-vs-E_exact regression slope -- both failed,
+   the second by divide-by-zero on the flat saturated branch).
+
+3. **Q2 headline is now: 12.3% raw suppression, plus the retained-fraction
+   pair (0.920 to 1.005).** The `-27.9%` line is gone from the headline
+   numbers; see item 1 for where it is preserved.
+
+### Round 6
 
 1. **Round 5's CASE (b) verdict was itself premature, and is SUPERSEDED.**
    Two compounding errors were found in the Round 5 analysis. First,
@@ -319,9 +360,12 @@ Q3 and Q5's original numbers were sound throughout and are unchanged.
        post-transition: offset mean=5.6709, std=0.3398 (NOT constant)
     VERDICT: CASE (a) -- combined curve monotone outside the large-disagreement (transition) window, both branches linear within small residuals. Round 5's CASE (b) is SUPERSEDED: the surviving inversion there was crossing the transition one-directionally, not scatter. Suppression numbers computed below.
     5. Kink magnitude (pre-slope - post-slope): noiseless=8.0000, noisy=7.0182
-       suppression = 1 - kink_noisy/kink_noiseless = 12.3% (RAW)
-       analytic baseline on post-transition branch, (1-w_eff)*dE_mix/dK = 3.2124 (dE_mix/dK=12.0000, computed via schwinger_core.exact_and_mix) -- subtracting it from the raw noisy post-transition slope (0.9610) gives an adjusted slope of -2.2514
-       suppression (baseline-adjusted) = -27.9% -- the adjusted post-slope overshoots past zero, meaning the naive analytic (1-w)*E_mix mixing picture OVER-predicts how much the post-transition branch should grow with K; the actual in-loop-trained noisy curve tracks it much less than that baseline, consistent with training partially compensating for the noise rather than passively mixing with it.
+       suppression = 1 - kink_noisy/kink_noiseless = 12.3% (RAW) -- this is the suppression figure.
+    5b. Retained fraction w_eff, slope-mixture model (paper Sec. VI C), dE_mix/dK=12.0000 via schwinger_core.exact_and_mix:
+        ordered branch (K in (4.25, 5.25)):   dE_exact/dK=8.0000, dE_inloop/dK=7.9792  ->  w_eff=1.005
+        saturated branch (K in (6.0, 7.0)): dE_exact/dK=0.0000, dE_inloop/dK=0.9610  ->  w_eff=0.920
+        Both land in [0.91, 1.02] (ordered 1.005 = 100.5%, saturated 0.920): the in-loop-trained noisy branches retain essentially the full exact slope, far above the passive-mixing w_eff=0.7323. The saturated branch is informative here (not degenerate) because dE_mix/dK is nonzero where dE_exact/dK is flat.
+        (The Round 6 baseline-adjusted suppression, -27.9%, is WITHDRAWN -- see Corrections Round 7. It double-counted this mixing correction.)
     6. Pre-transition ratio (0.9974) sits far above w_eff (0.7323), essentially at unity -- explained by the mixing model itself: dE_mix/dK=12.0000 is STEEPER than dE_exact/dK=8.0000 on this branch, so mixing predicts ratio = w_eff+(1-w_eff)*(dEmix/dEexact) = 1.1338 -- same regime (far above w_eff) as observed, not the ~w_eff suppression a naive reading would expect.
 
   ----------------------------------------------------------------------
