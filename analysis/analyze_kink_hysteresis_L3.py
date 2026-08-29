@@ -180,6 +180,64 @@ def explain_pretransition_ratio():
     print()
 
 
+def retained_fraction(dE_exact, dE_inloop, dE_mix):
+    """Effective retained fraction w_eff, slope-mixture model (paper Sec. VI C).
+
+    The in-loop slope on each branch is modelled as a mixture of the exact
+    curve and the maximally-mixed reference, ON THE SLOPES:
+
+        dE_inloop/dK = w_eff*(dE_exact/dK) + (1 - w_eff)*(dE_mix/dK)
+
+    solved for the retained fraction:
+
+        w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)
+
+    dE_mix/dK is the third leg. That is what makes the saturated branch
+    (where dE_exact/dK is exactly 0) informative rather than degenerate:
+    dE_mix/dK is nonzero there, so the denominator is nonzero.
+
+    Result at N=3: ordered branch w_eff = 1.005 (100.5%), saturated branch
+    w_eff = 0.920, both in [0.91, 1.02].
+
+    Two definitions tried in Round 6 are NOT this formula:
+      (1) a shared depolarizing-mixing-model least-squares solve for w per
+          branch, regressing E_noisy against E_exact directly, gave 0.89
+          (pre-transition) / 0.93 (post-transition) -- the wrong pairing,
+          and neither is the paper's 1.005 / 0.920.
+      (2) a plain E_noisy-vs-E_exact regression slope gave 0.9974
+          pre-transition but blew up on the post-transition branch: E_exact
+          is exactly flat there, so regressing against it is a divide by
+          zero. Putting dE_mix/dK in as the third leg (this formula) is the
+          fix -- the flat branch becomes informative, not degenerate.
+    """
+    return (dE_mix - dE_inloop) / (dE_mix - dE_exact)
+
+
+def retained_fraction_analysis(K, E_noiseless, E_noisy):
+    """Report w_eff on both branches from the slope-mixture model above.
+    dE_mix/dK is computed via schwinger.core.exact_and_mix, not hardcoded
+    (at N=3 it comes out to 12.0: each of the three flavor-0 sites
+    contributes nu_0/2 with nu_0 = 2*sqrt(x)*K)."""
+    print("=== Retained-fraction analysis (slope-mixture model, paper Sec. VI C) ===")
+    labels = {"pre-transition": "ordered", "post-transition": "saturated"}
+    out = {}
+    for name, (lo, hi) in [("pre-transition", PRE_RANGE), ("post-transition", POST_RANGE)]:
+        Kp, Ep_nl = _select_range(K, E_noiseless, lo, hi)
+        _, Ep_ny = _select_range(K, E_noisy, lo, hi)
+        dE_exact, _ = _linfit(Kp, Ep_nl)
+        dE_inloop, _ = _linfit(Kp, Ep_ny)
+        Kmix = np.linspace(lo, hi, 5)
+        Emix = np.array([core.exact_and_mix(3, k, convention="nu0only")[1] for k in Kmix])
+        dE_mix, _ = _linfit(Kmix, Emix)
+        w = retained_fraction(dE_exact, dE_inloop, dE_mix)
+        label = labels[name]
+        print(f"  {label} branch (K in [{lo},{hi}]): dE_exact/dK={dE_exact:.4f}, "
+              f"dE_inloop/dK={dE_inloop:.4f}, dE_mix/dK={dE_mix:.4f}  ->  w_eff={w:.4f}")
+        out[label] = dict(dE_exact=dE_exact, dE_inloop=dE_inloop, dE_mix=dE_mix, w_eff=w)
+    print()
+    return out
+
+
 def kink_and_baseline(slopes):
     print("=== Kink magnitude and suppression ===")
     kink_nl = slopes["pre-transition"]["slope_nl"] - slopes["post-transition"]["slope_nl"]
@@ -188,6 +246,11 @@ def kink_and_baseline(slopes):
     print(f"  kink_noiseless = {kink_nl:.4f}, kink_noisy = {kink_ny:.4f}")
     print(f"  suppression = 1 - kink_noisy/kink_noiseless = {suppression:.1f}% (raw)")
 
+    # Round 7: the baseline-adjusted suppression below is NO LONGER promoted
+    # to results/SUMMARY.md's headline (it was -27.9%, WITHDRAWN -- it
+    # double-counts the mixing correction that retained_fraction() already
+    # applies, driving the adjusted post-transition slope to an unphysical
+    # -2.25). Computation kept here for the record; see SUMMARY.md Round 7.
     # analytic (1-w)*dEmix/dK baseline on the post-transition branch
     Kp = np.linspace(POST_RANGE[0], POST_RANGE[1], 5)
     Emix = np.array([core.exact_and_mix(3, k, convention="nu0only")[1] for k in Kp])
@@ -245,6 +308,7 @@ def main():
               "linear within small residuals. Computing kink suppression and reporting as the "
               "paper's numbers.")
         kink_result = kink_and_baseline(slopes)
+        kink_result["retained_fraction"] = retained_fraction_analysis(K, comb_nl, comb_ny)
     else:
         case = "b"
         print(f"  CASE (b): genuine instability remains (inversions outside window: "
