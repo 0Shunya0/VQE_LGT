@@ -99,3 +99,13 @@ untransitioned N0=2 plateau, not "interior" to anything.
 labels should be read as "K=0 / first-transition K=2.5 / K=1.25" rather than
 "K=0 / boundary / interior". `results/noiseless_N4_control.csv` (Bug 3) uses
 the corrected points K = 0, 3.2, 6.4.
+
+**Round 7 note (Table X caption).** Stated plainly for the paper's Table X,
+which is fed by the three K points in `results/noisy_N4_spot.csv`: those
+three values, K = 0.00, 1.25, 2.50, span the low-K region matched to the
+noiseless restart-budget control (`exp07` / `results/noiseless_N4_control.csv`,
+which evaluates the same K values), NOT the boundary region. The corrected
+N=4 boundary is at K = 6.40; none of the three points reach it. The paper's
+Section VI E text is already consistent with this (it says only "three
+chemical potentials" and makes no boundary claim), and no boundary claim
+should be added.

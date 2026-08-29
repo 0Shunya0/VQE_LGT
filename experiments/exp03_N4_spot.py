@@ -8,6 +8,20 @@ boundary finder, reused rather than re-derived), p in {0.01,0.02}, 4 restarts.
 Convergence status (converged / hit_maxiter / diverged) is recorded per
 restart so stalling in the flattened p/d>>1 landscape shows up directly in
 the CSV, not just in the final energy.
+
+K-POINT LABELLING (Round 1 / Round 7 note -- read this before using
+results/noisy_N4_spot.csv). This run was generated when boundary_K(N=4)
+still returned the buggy, non-terminal K=2.50 crossing instead of the
+corrected terminal crossing at K=6.40 (see results/boundary_check.md). The
+three K points it actually sampled are K = 0.00, 1.25, 2.50. Read those as
+the low-K region matched to the noiseless restart-budget control (exp07 /
+results/noiseless_N4_control.csv), which evaluates the same K values, NOT
+as the phase-boundary region. The corrected N=4 boundary is K = 6.40, and
+none of the three points here reach it. The data is not rerun (per the
+standing rule that no numerical result changes); only its labelling was
+ambiguous, and this note fixes that. The paper's Section VI E is already
+consistent with this -- it says only "three chemical potentials" and makes
+no boundary claim about them.
 """
 import os as _os, sys as _sys
 _sys.path.insert(0, _os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
