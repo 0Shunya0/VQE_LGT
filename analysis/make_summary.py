@@ -793,7 +793,56 @@ def q5_gradvar():
 
 CORRECTIONS = """## Corrections
 
-### Round 7 (this version)
+### Round 8 (this version)
+
+1. **In-panel subplot titles were removed from all seven figure scripts at
+   a reviewer's request.** `figures/make_fig1.py` through `make_fig7.py`
+   previously carried `ax.set_title("(a) <description>")` on each panel; the
+   descriptions duplicated text the manuscript captions now carry. The
+   panels now show only bare `(a)`/`(b)`/... labels (top-left, above the
+   axes frame, one placement across all seven scripts). No plotted data
+   changed: same arrays, same COBYLA `seed=42`, same axis limits, legends,
+   colors, and `figsize`. Only the titles and the resulting bounding box
+   changed.
+
+2. **The Round 7 pixel-for-pixel figure-reproduction claim is SUPERSEDED
+   for the current PNGs.** Round 7 verified every figure regenerated
+   bit-identical in pixels to its committed PNG; removing the titles changes
+   the pixels by design. Reproduction is now verified at the data level: the
+   scripts' printed diagnostics are unchanged. The pre-existing diagnostic
+   lines (fig4's `physical GS -223.000, global -239.508`, fig7's ZNE
+   residuals) are byte-identical before and after the title edit; the fuller
+   diagnostic dumps added in Round 8 (fig4's per-lambda table and penalty
+   crossover at lambda=50, fig6's `|K| ~ 5.60` boundary and `S_max = 1.163`
+   nats) derive only from the already-plotted arrays and cross-check against
+   `results/boundary_check.md` (N=3 boundary 5.600). Round 8 diagnostics:
+     - fig4: penalty crossover (first lambda with fidelity >= 0.99) = 50.
+     - fig6: phase boundary `|K| ~ 5.60`, `S_max = 1.163` nats.
+     - fig7: ZNE residuals `p=1% -> 3.80, p=2% -> 10.53, p=5% -> 33.14`.
+   The pixel-identity result stands for the pre-cleanup PNGs, which remain
+   in git history: the committed `final_figs/*.png` at the parent of the
+   Round 8 figure commit are the original notebook-rendered images, and
+   Round 7 verified the extracted (with-title) scripts reproduced them
+   pixel-for-pixel.
+
+3. **Information that lived only in a subplot title, now moved to the
+   caption (not deleted):**
+     - fig1 (a): "lines: L-layer parameter budgets" -- what the three
+       horizontal line groups represent (also in the legend as "L=1/2/3
+       params").
+     - fig2 (a): "dotted: expressibility threshold" -- what the dotted
+       vertical lines mark (no legend entry for them).
+     - fig5 (a)/(b): "(20 restarts)" -- the restart count behind the violin
+       plots.
+     - fig6 (b): "kink at |K|~5.60" -- the phase-boundary location; now
+       printed to stdout by `make_fig6.py`.
+
+4. **`figures/make_fig8.py` was never committed; the pre-merge Fig 8 (a
+   retitled duplicate of Fig 7) now lives at
+   `notebooks/legacy_figs/make_fig8_legacy.py`. A flat `submission/` folder
+   was staged with the seven paper PNGs plus `main.tex` for journal upload.**
+
+### Round 7
 
 1. **The Round 6 baseline-adjusted suppression, -27.9%, is WITHDRAWN.** It
    was obtained by subtracting `(1-w_eff)*dE_mix/dK` (3.212) from the raw
