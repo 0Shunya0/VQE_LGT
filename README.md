@@ -26,15 +26,33 @@ keep it in the physical sector, or does it need a penalty term), and how much
 is genuinely attributable to hardware noise once the first two are controlled
 for.
 
-This repository also carries a six-round audit trail of that analysis:
+This repository also carries a seven-round audit trail of that analysis:
 `results/SUMMARY.md`'s Corrections section documents every methodological bug
 found and fixed along the way (grid mismatches, a phase-boundary tie-breaking
 bug, basin-capture failures in the optimizer, one-directional monotonicity
-gates that were never a fair test near a first-order transition), with every
-superseded or provisional number kept and explicitly annotated rather than
-silently replaced. No `.tex` source is tracked in this repository; the
-figure/table map below refers to the manuscript's own figure and table
-numbers.
+gates that were never a fair test near a first-order transition, a
+double-counted mixing correction), with every superseded or provisional
+number kept and explicitly annotated rather than silently replaced. No
+`.tex` source is tracked in this repository; the figure/table map below
+refers to the manuscript's own figure and table numbers.
+
+What is reproducible from this repository: every headline number in
+`results/SUMMARY.md` (via `analysis/make_summary.py` over the committed
+`results/*.csv`), the full pytest suite including the noiseless validation
+gate, and every panel of Figures 1-7 (via `figures/make_fig*.py` over the
+committed data and exact-diagonalization code). Figure reproduction is
+verified by regenerating each PNG from committed data and confirming the
+scripts' printed diagnostics (fig4's penalty crossover, fig6's phase
+boundary and S_max, fig7's ZNE residuals) are unchanged. Through Round 7
+every figure also regenerated pixel-for-pixel identical to its committed
+PNG; Round 8 removed the in-panel subplot titles at a reviewer's request, so
+the pixels changed by design and that check now applies to the pre-cleanup
+versions, which remain in git history. What is not: the manuscript
+`.tex` and its bibliography, and the raw multi-hour sweeps behind
+`results/*.csv` are reproducible only in the sense that re-running the
+`experiments/exp*.py` scripts with the committed `SEED_BASE` values
+regenerates them (`experiments/exp04_gradvar.py` is byte-identical; the
+COBYLA-heavy sweeps match to optimizer tolerance).
 
 ## Install
 
@@ -128,14 +146,15 @@ Corrections section.
 
 ```bash
 python analysis/make_summary.py     # -> results/SUMMARY.md: every headline number below, plus the
-                                     #    full six-round Corrections history, nothing silently replaced
+                                     #    full seven-round Corrections history, nothing silently replaced
 python analysis/check_boundary.py   # -> results/boundary_check.md: independent boundary_K verification,
                                      #    via direct <N_0> level-crossing scans rather than boundary_K itself
 ```
 
 `analysis/analyze_kink_dense_L3.py`, `analyze_kink_warmstart_L3.py`, and
 `analyze_kink_hysteresis_L3.py` are the three successive kink-suppression
-analyses (Rounds 4, 5, and 6 respectively) that `make_summary.py` draws on.
+analyses (Rounds 4, 5, and 6 respectively; the Round 6 script also carries
+the Round 7 retained-fraction solve) that `make_summary.py` draws on.
 They are kept as three separate scripts rather than merged into one, since
 each is independently runnable, each documents a distinct stage of the
 audit's reasoning, and merging them would have obscured exactly which
@@ -143,10 +162,41 @@ methodological assumption changed between rounds.
 
 ## Figures
 
-| figure | script | status |
+All seven figures are extracted from the notebooks as standalone
+`figures/make_fig*.py` scripts, and re-run to regenerate their PNGs in
+`final_figs/`. In-panel subplot titles were removed in Round 8 at a
+reviewer's request; the panels now carry only bare (a)/(b)/... labels and
+all descriptive text lives in the manuscript captions. Reproduction is
+checked by confirming each script's printed diagnostics are unchanged, not
+by pixel comparison (which Round 8 broke by design; the pixel-identical
+check through Round 7 still applies to the pre-cleanup PNGs in git history).
+Figs. 2-5 re-run COBYLA VQE internally (`schwinger.core.run_vqe` /
+`run_vqe_scaling`, `seed=42`), not just replot saved data, so their exact
+reproduction depends on the `scipy` version matching `requirements.txt`;
+Figs. 1, 6, 7 are pure exact-diagonalization / analytic replays with no
+optimizer in the loop.
+
+| figure | script | what it plots |
 |---|---|---|
-| Fig. 6 (phase boundary under noise) | `figures/make_fig6.py` | generates `final_figs/fig6_phase_boundary.png`: exact, post-hoc-noisy, post-hoc-ZNE, and in-loop noisy energy curves side by side, with the located phase boundary marked |
-| Figs. 1-5, 7, 8 | not yet extracted as standalone scripts | the PNGs already exist in `final_figs/`, but the code that generated them lives in the exploratory notebooks under `notebooks/` and has not been pulled out into standalone `figures/make_fig*.py` scripts; pulling code out of a notebook risks changing a seed path or an RNG draw order, so it was left for a follow-up pass rather than risking that here |
+| Fig. 1 | `figures/make_fig1.py` | `fig1_baseline.png`: Hilbert-space growth, ground-state entanglement entropy, finite-size energy per site (exact diagonalization, N=2..6) |
+| Fig. 2 | `figures/make_fig2.py` | `fig2_expressibility.png`: relative energy error vs depth, the p/d collapse, and the expressibility-derived hardware cost (N=2,3 re-run VQE; N=4,5,6 from the notebook's `precomputed` table) |
+| Fig. 3 | `figures/make_fig3.py` | `fig3_ksweep.png`: GI vs HW across a 33-point K-sweep -- energy, charge-sector leakage, fidelity, flavor numbers, error (re-runs VQE, ~10 min) |
+| Fig. 4 | `figures/make_fig4.py` | `fig4_penalty.png`: HW-ansatz charge-penalty sweep at K=-14 -- energy, leakage, fidelity vs lambda |
+| Fig. 5 | `figures/make_fig5.py` | `fig5_stability_convergence.png`: optimization-stability violin plots over 20 restarts plus best-of-5 convergence traces (merges the pre-refactor Figs. 5 and 6) |
+| Fig. 6 | `figures/make_fig6.py` | `fig6_phase_boundary.png`: exact, post-hoc-noisy, post-hoc-ZNE, and in-loop noisy energy curves side by side, with the located phase boundary marked |
+| Fig. 7 | `figures/make_fig7.py` | `fig7_zne_robustness.png`: ZNE residual vs per-CNOT depolarizing strength at the N=3 boundary (analytic) |
+
+`final_figs/fig8_zne_robustness.png` is a stale artifact of the pre-merge
+figure numbering (before the old Figs. 5 and 6 were merged into one, every
+later figure was one higher). It is the same plot as Fig. 7 with a "Figure 8"
+title. It is left in `final_figs/` rather than deleted; its generator lives
+at `notebooks/legacy_figs/make_fig8_legacy.py`, not in `figures/`.
+
+`submission/` is the flat folder staged for journal upload: the seven paper
+figures copied from `final_figs/` (not moved -- `final_figs/` stays the
+scripts' output target) alongside `main.tex`. It is generated, not
+hand-maintained: refresh it by re-running the `make_fig*.py` scripts and
+re-copying. The stale pre-merge PNGs are deliberately not in it.
 
 ## Tests
 
@@ -166,16 +216,17 @@ python -m pytest tests/test_reproduce_paper_numbers.py
   `N=3,L=2 -> -43.560` and `N=4,L=5 -> -68.562` to within `1e-3` absolute
   energy.
 - `test_reproduce_paper_numbers.py`: parses `results/*.csv` directly (not
-  copies of the numbers) and asserts the headline values listed below. One
-  assertion, `retained fraction`, is marked `xfail`: it does not correspond
-  to any quantity computed anywhere in this codebase or in
-  `results/SUMMARY.md`, and the two most natural definitions tried against
-  the actual hysteresis data both land outside the claimed `0.92-1.01` range
-  (one gives `0.89`/`0.93` per branch, the other diverges on the
-  post-transition branch because the exact energy is flat there and gives
-  the regression nothing to fit against). See that test's docstring for the
-  full derivation of both attempts. It needs a confirmed formula before it
-  can be asserted honestly, rather than one chosen to make the test pass.
+  copies of the numbers) and asserts the headline values listed below,
+  including `test_retained_fraction_both_branches` (Round 7): the paper's
+  Section VI C slope-mixture retained-fraction solve,
+  `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)`, giving
+  1.005 (100.5%) on the ordered branch and 0.920 on the saturated branch.
+  This was `xfail` through Round 6 (the formula was not in the codebase and
+  two guessed definitions both failed); the confirmed formula lands both
+  branches in `[0.91, 1.02]` (the assertion bound is not the tighter
+  `[0.92, 1.01]` because the saturated branch is 0.91992, just under a
+  nominal 0.92, and the ordered branch is genuinely above 1) and the
+  assertion now runs.
 
 ### Bug fix: `boundary_K`
 
@@ -219,14 +270,16 @@ full reasoning and audit history behind each one:
   to 43.3% at `p=0.05`. The post-hoc contraction is not a substitute for
   actually training against the noisy circuit; the gap widens with noise
   strength rather than staying roughly constant.
-- **Kink suppression (Round 6, bidirectional-hysteresis check, N=3, L=3,
+- **Kink suppression (Round 7, bidirectional-hysteresis check, N=3, L=3,
   p=0.01).** 12.3% raw suppression of the transition's slope drop under
-  noise. After subtracting the analytic `(1-w_eff)*dE_mix/dK` baseline from
-  the post-transition branch, the adjusted figure is -27.9%: the naive
-  post-hoc mixing picture over-predicts how much that branch should grow
-  with `K`, so the adjusted number overshoots past zero. Both numbers are
-  reported side by side rather than picking one; see `results/SUMMARY.md`
-  Section 2 for the full derivation.
+  noise, reported alongside the paper's Section VI C retained-fraction pair:
+  `w_eff = 0.920` on the saturated branch and `1.005` (100.5%) on the
+  ordered branch, from the slope-mixture solve
+  `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)` (both in
+  `[0.91, 1.02]`). Both branches retain essentially the full exact slope,
+  far above the passive-mixing `w_eff = 0.732`. (Round 6's baseline-adjusted -27.9% figure
+  is withdrawn -- it double-counted the mixing correction; see
+  `results/SUMMARY.md` Corrections, Round 7.)
 - **In-loop ZNE boundary residuals.** 0.86, 1.23, and 4.14 (energy units) at
   `p=0.01, 0.02, 0.05` respectively, versus a post-hoc reference of 3.8,
   10.5, and 33 at the same three noise strengths: in-loop training combined
@@ -250,7 +303,7 @@ full reasoning and audit history behind each one:
   point to 0.080% error at only 8 restarts, confirming the failure was
   depth-limited, not optimization-limited.
 
-`results/SUMMARY.md`'s Corrections section documents all six rounds of
+`results/SUMMARY.md`'s Corrections section documents all seven rounds of
 audit-driven fixes behind these numbers in full: what was wrong, how it was
 diagnosed, what was run to check it, and what changed as a result, with
 every superseded or provisional figure kept in place and explicitly
