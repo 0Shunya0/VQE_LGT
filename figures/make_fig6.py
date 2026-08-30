@@ -21,6 +21,13 @@ P_SHOW = 0.01  # representative p, matches the post-hoc figure's default
 N_noise, NCX, conv = 3, core.NCX_N3_L2, "nu0only"
 
 
+def _panel(ax, label):
+    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
+    Descriptive text lives in the manuscript caption, not on the figure."""
+    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
+            fontweight="bold", fontsize=10)
+
+
 def main():
     os.makedirs(FIG_DIR, exist_ok=True)
 
@@ -48,8 +55,8 @@ def main():
     if have_inloop:
         ax[0].plot(K_il, E_il / N_noise, '^-', color='#1f77b4', ms=5, lw=1.5,
                    label=f'in-loop noisy (p={P_SHOW})')
-    ax[0].set_xlabel('$K$'); ax[0].set_ylabel(r'$E_0/N$ ($N=3$)'); ax[0].set_title('(a) energy under noise')
-    ax[0].legend(frameon=False, fontsize=7)
+    ax[0].set_xlabel('$K$'); ax[0].set_ylabel(r'$E_0/N$ ($N=3$)')
+    ax[0].legend(frameon=False, fontsize=7); _panel(ax[0], '(a)')
 
     de, dn, dz = np.gradient(ex, Kv), np.gradient(no, Kv), np.gradient(zn, Kv)
     ax[1].plot(Kv, de, 'k--', label='exact')
@@ -59,15 +66,20 @@ def main():
         d_il = np.gradient(E_il, K_il)
         ax[1].plot(K_il, d_il, '^-', color='#1f77b4', ms=5, lw=1.5, label='in-loop noisy')
     ax[1].axvline(kb, color='gray', ls=':'); ax[1].axvline(-kb, color='gray', ls=':')
-    ax[1].set_xlabel('$K$'); ax[1].set_ylabel('$dE/dK$'); ax[1].set_title(f'(b) kink at |K|~{kb:.2f}')
+    ax[1].set_xlabel('$K$'); ax[1].set_ylabel('$dE/dK$')
     a2 = ax[1].twinx(); a2.plot(Kv, S, ':', color='#6a3d9a', lw=1.2)
     a2.set_ylabel('$S$ (nats)', color='#6a3d9a'); a2.tick_params(axis='y', colors='#6a3d9a')
-    ax[1].legend(frameon=False, loc='upper left', fontsize=7)
+    ax[1].legend(frameon=False, loc='upper left', fontsize=7); _panel(ax[1], '(b)')
 
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig6_phase_boundary.png")
     plt.savefig(out_path)
+    # Diagnostic (Round 8): the kink location that used to sit in panel (b)'s
+    # title now goes to the manuscript caption. Also S_max, which the caption
+    # references.
     print(f"Saved {out_path} (in-loop curve {'included' if have_inloop else 'MISSING -- run Experiment 1 first'})")
+    print(f"  phase boundary |K| ~ {kb:.2f}  (core.boundary_K, N=3)")
+    print(f"  S_max over the K grid = {float(S.max()):.3f} nats")
 
 
 if __name__ == "__main__":
