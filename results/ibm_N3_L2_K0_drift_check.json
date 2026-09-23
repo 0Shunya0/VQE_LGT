@@ -1,0 +1,72 @@
+{
+  "status": "PARTIALLY INVALID: E1 and E2 rows are EstimatorV2 results and are INVALID; S1 and S2 (SamplerV2) are VALID. Estimator-derived; the runtime EstimatorV2 returned 0 +/- 0 for the Y-Z-Y group on physical qubits (8,9,10),(10,11,18), so the energy is missing ~9.5 units. See results/ibm_N3_L2_K0_gap_localize.json.",
+  "E_exact": -43.56603968487641,
+  "order": [
+    "S1",
+    "E1",
+    "S2",
+    "E2"
+  ],
+  "layout": [
+    8,
+    9,
+    10,
+    11,
+    18,
+    31
+  ],
+  "reference": {
+    "job1_sampler": -36.7279052734375,
+    "job0_estimator": -26.922119
+  },
+  "jobs": {
+    "S1": {
+      "status": "VALID (SamplerV2)",
+      "job_id": "daofnv78gn2s739nqjlg",
+      "energy": -35.660400390625,
+      "rel_err_pct": 18.146334510629814,
+      "qpu_seconds": 13,
+      "timestamps": {
+        "created": "2026-09-21T09:42:20.4376Z",
+        "finished": "2026-09-21T09:43:01.682283Z",
+        "running": "2026-09-21T09:42:22.209897Z"
+      }
+    },
+    "E1": {
+      "status": "INVALID (EstimatorV2; see top-level status)",
+      "job_id": "daofnvg2fm4c73f5cok0",
+      "energy": -25.333984375,
+      "rel_err_pct": 41.84923725395567,
+      "qpu_seconds": 8,
+      "timestamps": {
+        "created": "2026-09-21T09:42:22.100683Z",
+        "finished": "2026-09-21T09:43:07.597261Z",
+        "running": "2026-09-21T09:42:23.373613Z"
+      }
+    },
+    "S2": {
+      "status": "VALID (SamplerV2)",
+      "job_id": "daofnvopqrnc7399u9ig",
+      "energy": -36.0087890625,
+      "rel_err_pct": 17.346655048381283,
+      "qpu_seconds": 13,
+      "timestamps": {
+        "created": "2026-09-21T09:42:23.681021Z",
+        "finished": "2026-09-21T09:43:20.00652Z",
+        "running": "2026-09-21T09:42:25.188222Z"
+      }
+    },
+    "E2": {
+      "status": "INVALID (EstimatorV2; see top-level status)",
+      "job_id": "daofo0f8gn2s739nqjp0",
+      "energy": -25.231689453125,
+      "rel_err_pct": 42.08404152493123,
+      "qpu_seconds": 8,
+      "timestamps": {
+        "created": "2026-09-21T09:42:25.121718Z",
+        "finished": "2026-09-21T09:43:26.775675Z",
+        "running": "2026-09-21T09:42:26.345278Z"
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "backend": "ibm_marrakesh",
+  "n_bases": 5,
+  "shots_per_basis": 8192,
+  "total_shots": 40960,
+  "est_qpu_s": 16.484,
+  "n_cz": 20,
+  "depth": 65,
+  "queue_len": 0,
+  "seed_transpiler": 0,
+  "opt_level": 3
+}

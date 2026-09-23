@@ -1,0 +1,66 @@
+{
+  "status": "INVALID: Job 0, Job A, Job B are all EstimatorV2 results. Estimator-derived; the runtime EstimatorV2 returned 0 +/- 0 for the Y-Z-Y group on physical qubits (8,9,10),(10,11,18), so the energy is missing ~9.5 units. See results/ibm_N3_L2_K0_gap_localize.json.",
+  "E_exact": -43.56603968487641,
+  "E_mix": 1.8000000000000014,
+  "physical_qubits": [
+    8,
+    9,
+    10,
+    11,
+    18,
+    31
+  ],
+  "n_cz": 20,
+  "depth": 67,
+  "jobs": {
+    "Job0_baseline": {
+      "status": "INVALID",
+      "job_id": "daof9vdr85ps73ff6u10",
+      "energy": -26.922119140625,
+      "std": 0.33630692306081894,
+      "rel_err_pct": 38.20388693725863,
+      "qpu_seconds": 8,
+      "timestamps": {
+        "created": "2026-09-21T09:12:29.560532Z",
+        "finished": "2026-09-21T09:12:50.439832Z",
+        "running": "2026-09-21T09:12:31.08511Z"
+      },
+      "t_submit": 1789981950.3961134
+    },
+    "JobA_readout": {
+      "status": "INVALID",
+      "job_id": "daof9vo2fm4c73f5c63g",
+      "energy": -28.5475554578724,
+      "std": 0.23546364308147877,
+      "rel_err_pct": 34.472915912569285,
+      "qpu_seconds": 17,
+      "timestamps": {
+        "created": "2026-09-21T09:12:31.413829Z",
+        "finished": "2026-09-21T09:13:16.824575Z",
+        "running": "2026-09-21T09:12:32.243817Z"
+      },
+      "t_submit": 1789981952.2649107
+    },
+    "JobB_readout_zne": {
+      "status": "INVALID",
+      "job_id": "daofa082fm4c73f5c640",
+      "energy": -31.12476329011414,
+      "std": NaN,
+      "rel_err_pct": 28.5572810490763,
+      "qpu_seconds": 22,
+      "timestamps": {
+        "created": "2026-09-21T09:12:33.254739Z",
+        "finished": "2026-09-21T09:13:29.519221Z",
+        "running": "2026-09-21T09:12:33.866898Z"
+      },
+      "t_submit": 1789981954.0926423
+    }
+  },
+  "readout_fraction_batch": 1.6254363172473987,
+  "step1_readout_correction": 1.9604405034672965,
+  "job0_vs_job1_drift": 9.8057861328125,
+  "p_eff_job0_pct": 2.210433520454824,
+  "zne_analytic_prediction": -35.4098093079961,
+  "jobB_vs_exact": 12.44127639476227,
+  "jobB_vs_zne_prediction": 4.28504601788196
+}

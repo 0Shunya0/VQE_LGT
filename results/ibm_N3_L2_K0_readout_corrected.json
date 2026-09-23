@@ -1,0 +1,60 @@
+{
+  "job_id": "daoeuotr85ps73ff6a70",
+  "physical_qubits": [
+    8,
+    9,
+    10,
+    11,
+    18,
+    31
+  ],
+  "readout_probs": [
+    {
+      "qubit": 8,
+      "prob_meas1_prep0": 0.000244140625,
+      "prob_meas0_prep1": 0.005615234375
+    },
+    {
+      "qubit": 9,
+      "prob_meas1_prep0": 0.001220703125,
+      "prob_meas0_prep1": 0.021484375
+    },
+    {
+      "qubit": 10,
+      "prob_meas1_prep0": 0.003173828125,
+      "prob_meas0_prep1": 0.00439453125
+    },
+    {
+      "qubit": 11,
+      "prob_meas1_prep0": 0.0068359375,
+      "prob_meas0_prep1": 0.01708984375
+    },
+    {
+      "qubit": 18,
+      "prob_meas1_prep0": 0.000732421875,
+      "prob_meas0_prep1": 0.010498046875
+    },
+    {
+      "qubit": 31,
+      "prob_meas1_prep0": 0.003173828125,
+      "prob_meas0_prep1": 0.013427734375
+    }
+  ],
+  "E_exact": -43.56603968487641,
+  "E_mix": 1.8000000000000014,
+  "E_raw": -36.7279052734375,
+  "E_readout_corrected": -38.6883457769048,
+  "rel_err_raw_pct": 15.696020250866894,
+  "rel_err_corrected_pct": 11.196092055309913,
+  "readout_points_explained": 4.499928195556981,
+  "p_eff_raw_pct": 0.7637220771965159,
+  "p_eff_readout_corrected_pct": 0.5671338220531674,
+  "negative_prob_mass_per_basis": [
+    0.0,
+    -2.335733608552404e-05,
+    -0.0007485970056318027,
+    0.0,
+    -4.6941658229554924e-05
+  ],
+  "used_historical_calibration": true
+}

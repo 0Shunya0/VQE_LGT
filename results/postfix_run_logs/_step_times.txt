@@ -1,0 +1,28 @@
+=== START 01_exp13_warmstart_noiseless Fri Sep 18 10:58:38 IST 2026 ===
+=== END 01_exp13_warmstart_noiseless rc=0 elapsed=671s Fri Sep 18 11:09:49 IST 2026 ===
+=== START 02_exp14_warmstart_noisy Fri Sep 18 11:09:49 IST 2026 ===
+=== END 02_exp14_warmstart_noisy rc=0 elapsed=1099s Fri Sep 18 11:28:08 IST 2026 ===
+=== START 03_seed_hysteresis_ascending Fri Sep 18 11:28:08 IST 2026 ===
+=== START 03_seed_hysteresis_ascending Fri Sep 18 18:58:48 IST 2026 ===
+=== END 03_seed_hysteresis_ascending rc=0 elapsed=1s Fri Sep 18 18:58:49 IST 2026 ===
+=== START 04_exp01_inloop_N3 Fri Sep 18 18:58:49 IST 2026 ===
+=== END 04_exp01_inloop_N3 rc=0 elapsed=2679s Fri Sep 18 19:43:28 IST 2026 ===
+=== START 05_exp09_hysteresis_noiseless Fri Sep 18 19:43:28 IST 2026 ===
+=== END 05_exp09_hysteresis_noiseless rc=0 elapsed=772s Fri Sep 18 19:56:20 IST 2026 ===
+=== START 06_exp09_hysteresis_noisy Fri Sep 18 19:56:20 IST 2026 ===
+=== END 06_exp09_hysteresis_noisy rc=0 elapsed=1213s Fri Sep 18 20:16:33 IST 2026 ===
+=== START 07_exp02_inloop_zne_N3 Fri Sep 18 20:16:33 IST 2026 ===
+=== END 07_exp02_inloop_zne_N3 rc=0 elapsed=8758s Fri Sep 18 22:42:31 IST 2026 ===
+=== START 08_exp08_kink_dense_L3_noiseless Fri Sep 18 22:42:31 IST 2026 ===
+=== END 08_exp08_kink_dense_L3_noiseless rc=0 elapsed=508s Fri Sep 18 22:50:59 IST 2026 ===
+=== START 09_exp08_kink_dense_L3_noisy Fri Sep 18 22:50:59 IST 2026 ===
+=== END 09_exp08_kink_dense_L3_noisy rc=0 elapsed=783s Fri Sep 18 23:04:02 IST 2026 ===
+=== START 10_exp03_N4_spot Fri Sep 18 23:04:03 IST 2026 ===
+=== END 10_exp03_N4_spot rc=0 elapsed=1271s Fri Sep 18 23:25:14 IST 2026 ===
+=== START 11_exp04_gradvar Fri Sep 18 23:25:14 IST 2026 ===
+=== END 11_exp04_gradvar rc=0 elapsed=24s Fri Sep 18 23:25:38 IST 2026 ===
+=== START 12_exp05_kink_dense_L2 Fri Sep 18 23:25:38 IST 2026 ===
+=== END 12_exp05_kink_dense_L2 rc=0 elapsed=638s Fri Sep 18 23:36:16 IST 2026 ===
+=== START 13_exp07_noiseless_N4_control Fri Sep 18 23:36:16 IST 2026 ===
+=== END 13_exp07_noiseless_N4_control rc=0 elapsed=592s Fri Sep 18 23:46:08 IST 2026 ===
+=== BATCH COMPLETE Fri Sep 18 23:46:08 IST 2026 ===

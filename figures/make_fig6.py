@@ -13,19 +13,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 import schwinger.core as core
+import style
 
 RESULTS_DIR = "results"
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 P_SHOW = 0.01  # representative p, matches the post-hoc figure's default
 
 N_noise, NCX, conv = 3, core.NCX_N3_L2, "nu0only"
 
-
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
+style.apply()
 
 
 def main():
@@ -47,29 +43,30 @@ def main():
         best = df[df["is_best"] & (df["p"] == P_SHOW) & (df["K"].abs() <= 8.0)].sort_values("K")
         K_il, E_il = best["K"].to_numpy(), best["energy"].to_numpy()
 
-    fig, ax = plt.subplots(1, 2, figsize=(9.6, 3.2))
+    fig, ax = plt.subplots(1, 2, figsize=(style.FULL_WIDTH, 2.6))
     ax[0].plot(Kv, ex / N_noise, 'k--', label='exact')
-    ax[0].plot(Kv, no / N_noise, 'o-', color='#d62728', ms=3,
+    ax[0].plot(Kv, no / N_noise, 'o-', color='#d62728', ms=2.5,
                label=f'post-hoc noisy ({100 * (1 - (1 - P_SHOW) ** NCX):.1f}%)')
-    ax[0].plot(Kv, zn / N_noise, 's-', color='#2ca02c', ms=3, label='post-hoc ZNE')
+    ax[0].plot(Kv, zn / N_noise, 's-', color='#2ca02c', ms=2.5, label='post-hoc ZNE')
     if have_inloop:
-        ax[0].plot(K_il, E_il / N_noise, '^-', color='#1f77b4', ms=5, lw=1.5,
+        ax[0].plot(K_il, E_il / N_noise, '^-', color='#1f77b4', ms=4, lw=1.2,
                    label=f'in-loop noisy (p={P_SHOW})')
     ax[0].set_xlabel('$K$'); ax[0].set_ylabel(r'$E_0/N$ ($N=3$)')
-    ax[0].legend(frameon=False, fontsize=7); _panel(ax[0], '(a)')
+    ax[0].legend(frameon=False, fontsize=8); style.panel_label(ax[0], '(a)')
 
     de, dn, dz = np.gradient(ex, Kv), np.gradient(no, Kv), np.gradient(zn, Kv)
     ax[1].plot(Kv, de, 'k--', label='exact')
-    ax[1].plot(Kv, dn, 'o-', color='#d62728', ms=3, label='post-hoc noisy')
-    ax[1].plot(Kv, dz, 's-', color='#2ca02c', ms=3, label='post-hoc ZNE')
+    ax[1].plot(Kv, dn, 'o-', color='#d62728', ms=2.5, label='post-hoc noisy')
+    ax[1].plot(Kv, dz, 's-', color='#2ca02c', ms=2.5, label='post-hoc ZNE')
     if have_inloop and len(K_il) > 2:
         d_il = np.gradient(E_il, K_il)
-        ax[1].plot(K_il, d_il, '^-', color='#1f77b4', ms=5, lw=1.5, label='in-loop noisy')
+        ax[1].plot(K_il, d_il, '^-', color='#1f77b4', ms=4, lw=1.2, label='in-loop noisy')
     ax[1].axvline(kb, color='gray', ls=':'); ax[1].axvline(-kb, color='gray', ls=':')
     ax[1].set_xlabel('$K$'); ax[1].set_ylabel('$dE/dK$')
-    a2 = ax[1].twinx(); a2.plot(Kv, S, ':', color='#6a3d9a', lw=1.2)
+    a2 = ax[1].twinx(); a2.plot(Kv, S, ':', color='#6a3d9a', lw=1.0, label='$S$')
     a2.set_ylabel('$S$ (nats)', color='#6a3d9a'); a2.tick_params(axis='y', colors='#6a3d9a')
-    ax[1].legend(frameon=False, loc='upper left', fontsize=7); _panel(ax[1], '(b)')
+    a2.legend(frameon=False, loc='upper right', fontsize=8, labelcolor='#6a3d9a')
+    style.panel_label(ax[1], '(b)')
 
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig6_phase_boundary.png")

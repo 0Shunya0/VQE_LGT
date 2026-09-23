@@ -1,0 +1,68 @@
+{
+  "sec_IVB": {
+    "GI": {
+      "energy": -43.559958429538746,
+      "Q_tot2": 0.0,
+      "N0": 1.9999917242244283,
+      "fidelity_single_vector": 0.9996030860353642,
+      "fidelity_projector": 0.999873092953496,
+      "per_ground_vector": [
+        0.9996030860353642,
+        0.0002700069181317959
+      ]
+    },
+    "HW": {
+      "energy": -35.547016528206264,
+      "Q_tot2": 0.6270305785097179,
+      "N0": 1.4932299252179981,
+      "fidelity_single_vector": 0.3476718866188094,
+      "fidelity_projector": 0.3477380280657099,
+      "per_ground_vector": [
+        0.3476718866188094,
+        6.614144690054828e-05
+      ]
+    }
+  },
+  "inloop": {
+    "0.005": {
+      "energy": -40.4664899980596,
+      "fidelity_single_vector": 0.8934351909139396,
+      "fidelity_projector": 0.8945161592962677,
+      "worker_reported_fidelity": 0.8934351909139396,
+      "per_ground_vector": [
+        0.8934351909139396,
+        0.0010809683823280285
+      ]
+    },
+    "0.01": {
+      "energy": -38.449975411095735,
+      "fidelity_single_vector": 0.8226649906519252,
+      "fidelity_projector": 0.8247989546121828,
+      "worker_reported_fidelity": 0.8226649906519252,
+      "per_ground_vector": [
+        0.8226649906519252,
+        0.0021339639602576017
+      ]
+    },
+    "0.02": {
+      "energy": -34.64191379586402,
+      "fidelity_single_vector": 0.6975197887804828,
+      "fidelity_projector": 0.7014435702240706,
+      "worker_reported_fidelity": 0.6975197887804828,
+      "per_ground_vector": [
+        0.6975197887804828,
+        0.00392378144358772
+      ]
+    },
+    "0.05": {
+      "energy": -25.2206525396613,
+      "fidelity_single_vector": 0.4257723255737844,
+      "fidelity_projector": 0.43410542919653666,
+      "worker_reported_fidelity": 0.4257723255737844,
+      "per_ground_vector": [
+        0.4257723255737844,
+        0.008333103622752247
+      ]
+    }
+  }
+}

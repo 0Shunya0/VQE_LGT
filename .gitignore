@@ -12,3 +12,17 @@ venv/
 *.blg
 *.synctex.gz
 .DS_Store
+
+figures/_test_*
+!figures/_test_page.tex
+!figures/_test_page_col.tex
+
+# local credentials (never commit)
+qiskit-ibm.json
+.qiskit/
+.env
+.env.*
+*.pem
+*apikey*
+*api_key*
+*credentials*

@@ -378,18 +378,18 @@ Q3 and Q5's original numbers were sound throughout and are unchanged.
 
 ## 1. In-loop noisy optimum vs post-hoc noisy estimate (N=3)
 
-  - p=0.005: mean|E_inloop - E_posthoc| = 6.995 (max 13.858) energy units, full range (33 K points)
-      mean absolute gap, central phase |K|<=4 = 2.536 (9 K points)
-      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 7.85%
-  - p=0.01: mean|E_inloop - E_posthoc| = 12.851 (max 26.264) energy units, full range (33 K points)
-      mean absolute gap, central phase |K|<=4 = 2.885 (9 K points)
-      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 5.33%
-  - p=0.02: mean|E_inloop - E_posthoc| = 23.502 (max 46.888) energy units, full range (33 K points)
-      mean absolute gap, central phase |K|<=4 = 6.877 (9 K points)
-      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 18.72%
-  - p=0.05: mean|E_inloop - E_posthoc| = 42.111 (max 83.019) energy units, full range (33 K points)
-      mean absolute gap, central phase |K|<=4 = 13.995 (9 K points)
-      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 43.34%
+  - p=0.005: mean|E_inloop - E_posthoc| = 7.074 (max 13.916) energy units, full range (33 K points)
+      mean absolute gap, central phase |K|<=4 = 2.876 (9 K points)
+      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 9.64%
+  - p=0.01: mean|E_inloop - E_posthoc| = 12.919 (max 26.346) energy units, full range (33 K points)
+      mean absolute gap, central phase |K|<=4 = 3.098 (9 K points)
+      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 5.83%
+  - p=0.02: mean|E_inloop - E_posthoc| = 23.403 (max 46.980) energy units, full range (33 K points)
+      mean absolute gap, central phase |K|<=4 = 6.608 (9 K points)
+      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 17.41%
+  - p=0.05: mean|E_inloop - E_posthoc| = 42.031 (max 83.211) energy units, full range (33 K points)
+      mean absolute gap, central phase |K|<=4 = 13.830 (9 K points)
+      mean relative gap |dE|/|E_exact|, central phase |K|<=4 = 42.80%
 
 ## 2. Kink suppression: in-loop vs post-hoc 19%
 
@@ -398,48 +398,48 @@ Q3 and Q5's original numbers were sound throughout and are unchanged.
     L=3: n_CX=30, cumulative infidelity 1-(0.99)^30 = 26.0%, w_eff=(1-p)^30*(1-2*eps)=0.7323
 
   BIDIRECTIONAL (HYSTERESIS) CONTINUATION CHECK (K=linspace(4,7,13), ascending AND descending passes, each warm-started in its own traversal direction):
-    1. Hysteresis window (|E_up-E_down|>0.001, literal): noiseless K in (5.5, 5.5), noisy K in (4.0, 7.0)
-       Large-disagreement subset (|E_up-E_down|>0.05, the physically meaningful window): noiseless K=[], noisy K=[4.0, 5.0, 5.25, 5.5]
+    1. Hysteresis window (|E_up-E_down|>0.001, literal): noiseless K in None, noisy K in (4.0, 7.0)
+       Large-disagreement subset (|E_up-E_down|>0.05, the physically meaningful window): noiseless K=[], noisy K=[4.0, 4.25, 4.5, 4.75, 5.0, 5.5]
        (At p=0.01 the optimizer's own noise floor already exceeds the literal 1e-3 tolerance almost everywhere -- COBYLA converges to slightly different points in a noise-flattened landscape even off-transition -- so the literal window overstates the transition's extent; the large-disagreement subset is the one used below.)
     2. Monotonicity gate (combined curve, inversions inside the large-disagreement window don't count -- expected first-order signature): noiseless 0 inversion(s) (0 outside window), noisy 0 inversion(s) (0 outside window)
-    3. Pre-transition branch (K in (4.25, 5.25)), on-branch linear fit: noiseless slope=8.0000 (max resid 0.0000), noisy slope=7.9792 (max resid 0.0460); ratio=0.9974 vs w_eff=0.7323 (NOT forced to agree -- diff=0.2651)
-       Post-transition branch (K in (6.0, 7.0)): noiseless slope=0.0000 (E_exact flat here by construction), noisy slope=0.9610 (max resid 0.0003) -- ratio undefined (~0 denominator), see kink-magnitude analysis below instead.
+    3. Pre-transition branch (K in (4.25, 5.25)), on-branch linear fit: noiseless slope=8.0000 (max resid 0.0000), noisy slope=7.6718 (max resid 0.0822); ratio=0.9590 vs w_eff=0.7323 (NOT forced to agree -- diff=0.2267)
+       Post-transition branch (K in (6.0, 7.0)): noiseless slope=-0.0000 (E_exact flat here by construction), noisy slope=0.9649 (max resid 0.0008) -- ratio undefined (~0 denominator), see kink-magnitude analysis below instead.
     4. Offset analysis (E_noisy - E_noiseless, combined curve):
-       pre-transition: offset mean=7.0751, std=0.0289 (consistent with constant)
-       post-transition: offset mean=5.6709, std=0.3398 (NOT constant)
+       pre-transition: offset mean=7.0930, std=0.1236 (consistent with constant)
+       post-transition: offset mean=5.6089, std=0.3411 (NOT constant)
     VERDICT: CASE (a) -- combined curve monotone outside the large-disagreement (transition) window, both branches linear within small residuals. Round 5's CASE (b) is SUPERSEDED: the surviving inversion there was crossing the transition one-directionally, not scatter. Suppression numbers computed below.
-    5. Kink magnitude (pre-slope - post-slope): noiseless=8.0000, noisy=7.0182
-       suppression = 1 - kink_noisy/kink_noiseless = 12.3% (RAW) -- this is the suppression figure.
+    5. Kink magnitude (pre-slope - post-slope): noiseless=8.0000, noisy=6.7069
+       suppression = 1 - kink_noisy/kink_noiseless = 16.2% (RAW) -- this is the suppression figure.
     5b. Retained fraction w_eff, slope-mixture model (paper Sec. VI C), dE_mix/dK=12.0000 via schwinger_core.exact_and_mix:
-        ordered branch (K in (4.25, 5.25)):   dE_exact/dK=8.0000, dE_inloop/dK=7.9792  ->  w_eff=1.005
-        saturated branch (K in (6.0, 7.0)): dE_exact/dK=0.0000, dE_inloop/dK=0.9610  ->  w_eff=0.920
-        Both land in [0.91, 1.02] (ordered 1.005 = 100.5%, saturated 0.920): the in-loop-trained noisy branches retain essentially the full exact slope, far above the passive-mixing w_eff=0.7323. The saturated branch is informative here (not degenerate) because dE_mix/dK is nonzero where dE_exact/dK is flat.
+        ordered branch (K in (4.25, 5.25)):   dE_exact/dK=8.0000, dE_inloop/dK=7.6718  ->  w_eff=1.082
+        saturated branch (K in (6.0, 7.0)): dE_exact/dK=-0.0000, dE_inloop/dK=0.9649  ->  w_eff=0.920
+        Ordered 1.082 (108.2%), saturated 0.920 (both above the passive-mixing baseline 0.7323): the in-loop-trained noisy branches retain essentially the full exact slope, far above the passive-mixing w_eff=0.7323. The saturated branch is informative here (not degenerate) because dE_mix/dK is nonzero where dE_exact/dK is flat.
         (The Round 6 baseline-adjusted suppression, -27.9%, is WITHDRAWN -- see Corrections Round 7. It double-counted this mixing correction.)
-    6. Pre-transition ratio (0.9974) sits far above w_eff (0.7323), essentially at unity -- explained by the mixing model itself: dE_mix/dK=12.0000 is STEEPER than dE_exact/dK=8.0000 on this branch, so mixing predicts ratio = w_eff+(1-w_eff)*(dEmix/dEexact) = 1.1338 -- same regime (far above w_eff) as observed, not the ~w_eff suppression a naive reading would expect.
+    6. Pre-transition ratio (0.9590) sits far above w_eff (0.7323), essentially at unity -- explained by the mixing model itself: dE_mix/dK=12.0000 is STEEPER than dE_exact/dK=8.0000 on this branch, so mixing predicts ratio = w_eff+(1-w_eff)*(dEmix/dEexact) = 1.1338 -- same regime (far above w_eff) as observed, not the ~w_eff suppression a naive reading would expect.
 
   ----------------------------------------------------------------------
   ASCENDING-ONLY WARM-START HISTORY (Round 5, SUPERSEDED -- see Corrections, Round 6):
 
   WARM-START CONTINUATION CHECK (ascending K, each seeded from the previous K's winner + 3 random restarts):
     1. Monotonicity gate (noisy curve): 1 inversion(s)
-       E(5.50)=6.1167 > E(5.75)=5.9652  [drop 0.1515]
-    2. Pre-transition (K<=5.25) slope scatter, noisy curve: cold-start max|slope jump|=4.743 -> warm-start=2.991 (reduced)
+       E(5.50)=5.9107 > E(5.75)=5.8979  [drop 0.0128]
+    2. Pre-transition (K<=5.25) slope scatter, noisy curve: cold-start max|slope jump|=5.551 -> warm-start=3.073 (reduced)
     3. Sanity gate (noiseless, warm-start): max|E-E_exact| over 13 K = 0.0060 (was 0.566 cold-start Round 3, 0.0081 after the 64-restart re-check Round 4) -- PASS
-    5. Warm-start win rate: noiseless 11/12 (91.7%), noisy 8/12 (66.7%)
-    VERDICT: CASE (b) -- the noisy curve stays non-monotone/scattered even warm-started (scatter reduced 4.743->2.991 but 1 inversion remains). NO suppression number computed. The instability itself -- not eliminated, only reduced, by warm-starting -- is the result.
+    5. Warm-start win rate: noiseless 11/12 (91.7%), noisy 10/12 (83.3%)
+    VERDICT: CASE (b) -- the noisy curve stays non-monotone/scattered even warm-started (scatter reduced 5.551->3.073 but 1 inversion remains). NO suppression number computed. The instability itself -- not eliminated, only reduced, by warm-starting -- is the result.
     4. (not computed -- case (b))
 
   ----------------------------------------------------------------------
   L=3 COLD-START HISTORY (Round 4, provisional -- see Corrections):
 
   L=3 REDO -- sanity gate (does L=3 noiseless track exact across K in [4,7]?), using the 64-restart/maxiter=4000 basin-capture re-check at K=5.25/5.50/5.75:
-    max |E_noiseless - E_exact| over 13 K points = 0.0081 energy units, at K=5.50
+    max |E_noiseless - E_exact| over 13 K points = 0.0073 energy units, at K=5.00
     PASS (threshold 0.1) -- the 64-restart re-check cleared the gate.
     exact:            drop=8.000, K_steep=5.625, width=0.504
-    L=3 noiseless:    drop=8.004, K_steep=5.625, width=0.501
-    L=3 noisy p=0.01: drop=10.487, K_steep=5.125, width=2.339
-    suppression vs exact = -31.1%, suppression vs NOISELESS (noise-attributable) = -31.0%
-    pre-transition slope ratio (noisy/noiseless) at K=4.0 = 1.220 vs analytic w_eff=(1-p)^30*(1-2*eps)=0.732
+    L=3 noiseless:    drop=8.002, K_steep=5.625, width=0.502
+    L=3 noisy p=0.01: drop=9.488, K_steep=5.125, width=0.812
+    suppression vs exact = -18.6%, suppression vs NOISELESS (noise-attributable) = -18.6%
+    pre-transition slope ratio (noisy/noiseless) at K=4.0 = 0.748 vs analytic w_eff=(1-p)^30*(1-2*eps)=0.732
     transition displacement, noisy vs NOISELESS = -0.500
 
   ----------------------------------------------------------------------
@@ -447,44 +447,44 @@ Q3 and Q5's original numbers were sound throughout and are unchanged.
 
   Dense grid (K=linspace(4,7,13), dK=0.25), p=0.01:
     exact:   dE/dK drop = 8.000 (from 8.000 to -0.000), transition at K~5.625, 90%-10% width = 0.504
-    in-loop: dE/dK drop = 5.995 (from 6.647 to 0.652), transition at K~4.875, 90%-10% width = 0.537
-  Integrated-slope-drop suppression = 1 - drop_inloop/drop_exact = 25.1%
+    in-loop: dE/dK drop = 6.029 (from 6.681 to 0.652), transition at K~4.625, 90%-10% width = 0.701
+  Integrated-slope-drop suppression = 1 - drop_inloop/drop_exact = 24.6%
   post-hoc reference: 19.0% (paper quotes 19%)
-  Pre-transition slope ratio in-loop/exact at K=4.0: 0.831 (vs analytic w_eff = (1-p)^20*(1-2*eps) = 0.810)
-  Transition displacement: in-loop sits at K~4.88 vs exact K~5.62 (displaced by 0.75), while the two widths are similar (0.54 vs 0.50) -- so most of the reduced slope-drop comes from the transition having MOVED to a region where the exact curve is still steep, not from broadening.
+  Pre-transition slope ratio in-loop/exact at K=4.0: 0.835 (vs analytic w_eff = (1-p)^20*(1-2*eps) = 0.810)
+  Transition displacement: in-loop sits at K~4.62 vs exact K~5.62 (displaced by 1.00), while the two widths are similar (0.70 vs 0.50) -- so most of the reduced slope-drop comes from the transition having MOVED to a region where the exact curve is still steep, not from broadening.
 
-  Noiseless control (p=0, eps=0, same grid): dE/dK drop = 6.939 (from 6.939 to -0.000), transition at K~5.125, 90%-10% width = 0.893
+  Noiseless control (p=0, eps=0, same grid): dE/dK drop = 6.703 (from 6.703 to -0.000), transition at K~5.125, 90%-10% width = 0.886
   CASE (ii): the noiseless control ALSO shifts the transition (to K~5.12, vs exact K~5.62) and/or broadens it (width 0.89 vs exact 0.50). The displacement seen at p=0.01 is (at least partly) an expressibility artifact of the L=2 ansatz near the near-degenerate level crossing, not purely a noise effect, and the noise-driven-displacement claim cannot be made as stated.
 
 ## 3. In-loop ZNE boundary residuals vs post-hoc 3.8 / 10.5 / 33
 
-  - p=0.01: in-loop ZNE boundary residual = 0.86 (post-hoc reference: 3.8)
-  - p=0.02: in-loop ZNE boundary residual = 1.23 (post-hoc reference: 10.5)
-  - p=0.05: in-loop ZNE boundary residual = 4.14 (post-hoc reference: 33)
+  - p=0.01: in-loop ZNE boundary residual = 0.84 (post-hoc reference: 3.8)
+  - p=0.02: in-loop ZNE boundary residual = 1.20 (post-hoc reference: 10.5)
+  - p=0.05: in-loop ZNE boundary residual = 4.02 (post-hoc reference: 33)
 
 ## 4. N=4 convergence at p=1% / p=2%, with a noiseless restart-budget control
 
   MATCHED K points (noiseless and noisy datasets both evaluated at these exact K):
   K     | noiseless err% | p=1% err% | p=2% err%
   -------------------------------------------------------
-  0.00  |           0.03% |    26.41% |    41.20%
-  1.25  |           0.17% |    35.98% |    57.35%
-  2.50  |           0.51% |    51.86% |    85.66%
+  0.00  |           0.08% |    25.69% |    43.23%
+  1.25  |           0.05% |    34.02% |    57.11%
+  2.50  |           0.22% |    52.81% |    88.69%
 
-  CASE (ii): noiseless 4-restart control at the matched K points reaches a mean 0.24% error -- the degradation seen under noise in noisy_N4_spot.csv is genuinely attributable to noise, not restart budget. The noise claim at N=4 stands.
+  CASE (ii): noiseless 4-restart control at the matched K points reaches a mean 0.12% error -- the degradation seen under noise in noisy_N4_spot.csv is genuinely attributable to noise, not restart budget. The noise claim at N=4 stands.
 
   Corrected-boundary points (no noisy counterpart, from results/boundary_check.md):
-    K=3.20 (half-boundary): noiseless err% = 0.64%
-    K=6.40 (boundary): noiseless err% = 2.84%
+    K=3.20 (half-boundary): noiseless err% = 0.46%
+    K=6.40 (boundary): noiseless err% = 1.42%
 
   Note: 'converged' (COBYLA's own success flag) is not reported here because it carries no information in this setup -- COBYLA hits maxiter on essentially every restart at N=4 regardless of noise (0/16 restarts formally converged even in the PASSING p=0 validation gate). err% vs the exact ground state is the only meaningful signal.
 
 ## 5. HW vs GI gradient variance
 
-  - N=2: GI=24.15 (paper: 23.0), HW=10.15 -> ratio GI/HW = 2.38x
-  - N=3: GI=23.02 (paper: 20.4), HW=5.50 -> ratio GI/HW = 4.19x
-  - N=4: GI=21.19 (paper: 19.3), HW=2.38 -> ratio GI/HW = 8.90x
+  - N=2: GI=24.15 (paper: 23.0), HW=10.47 -> ratio GI/HW = 2.31x
+  - N=3: GI=23.02 (paper: 20.4), HW=5.35 -> ratio GI/HW = 4.30x
+  - N=4: GI=21.19 (paper: 19.3), HW=2.41 -> ratio GI/HW = 8.78x
 
-  Decay factor over n_q = 4 -> 8 (N=2 -> N=4): GI = 1.14x, HW = 4.26x
+  Decay factor over n_q = 4 -> 8 (N=2 -> N=4): GI = 1.14x, HW = 4.34x
   Reference factors: e^{-n_q} = 54.6x (full barren-plateau exponential), e^{-n_q/2} = 7.39x (half-rate)
-  HW's measured 4.26x sits between the two references -- decay is faster than GI's 1.14x but slower than the full e^{-n_q} prediction; it does not, by itself, establish a barren plateau at this system size.
+  HW's measured 4.34x sits between the two references -- decay is faster than GI's 1.14x but slower than the full e^{-n_q} prediction; it does not, by itself, establish a barren plateau at this system size.

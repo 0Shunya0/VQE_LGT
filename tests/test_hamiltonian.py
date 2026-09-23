@@ -56,10 +56,10 @@ def test_boundary_K():
 
 @pytest.mark.slow
 def test_boundary_K_all_crossings():
-    """N=4 has two crossings in range: (K~2.5, N0 2->3) and (K~6.4, N0 3->4).
+    """N=4 has two crossings in range: (K~2.5, N0 2->1) and (K~6.4, N0 1->0), N0 = flavor-0 particle number (occupied = bit 0).
     all_crossings=True must return both, in K order."""
     crossings = core.boundary_K(N=4, x=X, convention="nu0only", all_crossings=True)
     assert len(crossings) == 2
     (k1, a1, b1), (k2, a2, b2) = crossings
-    assert abs(k1 - 2.5) < 0.05 and (a1, b1) == (2.0, 3.0)
-    assert abs(k2 - 6.4) < 0.05 and (a2, b2) == (3.0, 4.0)
+    assert abs(k1 - 2.5) < 0.05 and (a1, b1) == (2.0, 1.0)
+    assert abs(k2 - 6.4) < 0.05 and (a2, b2) == (1.0, 0.0)

@@ -1,0 +1,56 @@
+=== fig5_stability_convergence.py — 2026-09-14T19:37:18Z ===
+Stability + convergence: 20 restarts at K=0, N=2, L=2
+Saved final_figs\fig5_stability_convergence.png
+  stability panels: 20 restarts per ansatz at K=0, N=2, L=2
+  exact GS E_q0(K=0) = -30.5644
+
+=== fig3_ksweep.py — 2026-09-14T19:43:01Z ===
+Running K-sweep (N=2, L=2, 33 points)...
+  done in 655s
+Saved final_figs\fig3_ksweep.png
+
+=== fig3_ksweep.py — 2026-09-14T20:00:21Z ===
+Running K-sweep (N=2, L=2, 33 points)...
+  done in 396s
+Saved final_figs\fig3_ksweep.png
+
+=== fig3_ksweep.py — 2026-09-14T20:14:03Z ===
+Running K-sweep (N=2, L=2, 33 points)...
+  done in 396s
+  K sweep: qt2_hw, fid_hw per point
+    K=-16.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-15.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-14.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-13.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-12.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-11.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=-10.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -9.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -8.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -7.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -6.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -5.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -4.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -3.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -2.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= -1.000  qt2_hw=  0.0000  fid_hw=  1.0000
+    K=  0.000  qt2_hw=  0.0000  fid_hw=  1.0000
+    K=  1.000  qt2_hw=  0.0000  fid_hw=  1.0000
+    K=  2.000  qt2_hw=  0.0000  fid_hw=  1.0000
+    K=  3.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  4.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  5.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  6.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  7.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  8.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K=  9.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 10.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 11.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 12.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 13.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 14.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 15.000  qt2_hw=  1.0000  fid_hw=  0.0000
+    K= 16.000  qt2_hw=  1.0000  fid_hw=  0.0000
+  HW fid=0.5 crossings (K interval): [(np.float64(-2.0), np.float64(-1.0)), (np.float64(2.0), np.float64(3.0))]
+Saved final_figs\fig3_ksweep.png
+

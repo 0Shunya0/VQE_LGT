@@ -1,0 +1,22 @@
+\documentclass[aps,prd,twocolumn,10pt]{revtex4-2}
+\usepackage{graphicx}
+\graphicspath{{../pra_figures/}{../final_figs/}}
+\begin{document}
+\title{Figure placement test page}
+\author{test}
+\affiliation{test}
+\begin{abstract}
+Test page for figure sizing at actual print width. This is body text at
+10pt so figure font sizes can be judged against it directly.
+\end{abstract}
+\maketitle
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{FIGNAME}
+\caption{Test caption for column-width figure.}
+\end{figure}
+
+Body text after the figure, still at 10pt, for size comparison.
+
+\end{document}

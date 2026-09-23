@@ -18,20 +18,13 @@ import matplotlib.pyplot as plt
 
 from schwinger.core import (build_H_full, build_operators, make_psi0, run_vqe,
                             measure_state, gauge_invariant_ansatz, hw_efficient_ansatz)
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 X = 16.0
 R = dict(ksweep=8, penalty=10, stability=20, scaling=6, conv=5, maxiter=2500)
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
-
-
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
+style.apply()
 
 
 def main():
@@ -68,20 +61,20 @@ def main():
     crossover = next((r['lam'] for r in pen if r['fidelity'] >= 0.99), None)
     print(f"  penalty crossover (first lambda with fidelity >= 0.99): {crossover}")
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 5)); lp = [max(l, 0.3) for l in lambda_vals]
+    fig, axes = plt.subplots(1, 3, figsize=(style.FULL_WIDTH, 2.3)); lp = [max(l, 0.3) for l in lambda_vals]
     ax = axes[0]
-    ax.semilogx(lp, [r['E'] for r in pen], 'r-o', lw=2, ms=7, markeredgecolor='k', label='HW + penalty')
-    ax.axhline(E_q0_k14, color='blue', ls='--', lw=2, label=f'Physical GS: {E_q0_k14:.0f}')
-    ax.axhline(float(np.real(np.linalg.eigvalsh(H_k14)[0])), color='gray', ls=':', lw=1.5, label='Global min')
-    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel('Energy'); ax.legend(fontsize=8); _panel(ax, '(a)')
+    ax.semilogx(lp, [r['E'] for r in pen], 'r-o', lw=1.2, ms=4, markeredgecolor='k', label='HW + penalty')
+    ax.axhline(E_q0_k14, color='blue', ls='--', lw=1.2, label=f'physical GS: {E_q0_k14:.0f}')
+    ax.axhline(float(np.real(np.linalg.eigvalsh(H_k14)[0])), color='gray', ls=':', lw=1.0, label='global min')
+    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel('Energy'); ax.legend(fontsize=8); style.panel_label(ax, '(a)')
     ax = axes[1]
-    ax.semilogx(lp, [r['Q_tot2'] for r in pen], 'r-o', lw=2, ms=7, markeredgecolor='k', label='HW + penalty')
-    ax.axhline(0, color='blue', ls='--', lw=2, label='GI: 0 (exact)')
-    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel(r'$\langle Q_{tot}^2\rangle$'); ax.legend(fontsize=9); _panel(ax, '(b)')
+    ax.semilogx(lp, [r['Q_tot2'] for r in pen], 'r-o', lw=1.2, ms=4, markeredgecolor='k', label='HW + penalty')
+    ax.axhline(0, color='blue', ls='--', lw=1.2, label='GI: 0 (exact)')
+    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel(r'$\langle Q_{\mathrm{tot}}^2\rangle$'); ax.legend(fontsize=8); style.panel_label(ax, '(b)')
     ax = axes[2]
-    ax.semilogx(lp, [r['fidelity'] for r in pen], 'r-o', lw=2, ms=7, markeredgecolor='k', label='HW + penalty')
-    ax.axhline(o_gi['fidelity'], color='blue', ls='--', lw=2, label=f'GI: {o_gi["fidelity"]:.3f}')
-    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel('Fidelity'); ax.legend(fontsize=9); _panel(ax, '(c)')
+    ax.semilogx(lp, [r['fidelity'] for r in pen], 'r-o', lw=1.2, ms=4, markeredgecolor='k', label='HW + penalty')
+    ax.axhline(o_gi['fidelity'], color='blue', ls='--', lw=1.2, label=f'GI: {o_gi["fidelity"]:.3f}')
+    ax.set_xlabel(r'$\lambda$'); ax.set_ylabel('Fidelity'); ax.legend(fontsize=8); style.panel_label(ax, '(c)')
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig4_penalty.png")
     plt.savefig(out_path)

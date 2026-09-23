@@ -36,6 +36,19 @@ number kept and explicitly annotated rather than silently replaced. No
 `.tex` source is tracked in this repository; the figure/table map below
 refers to the manuscript's own figure and table numbers.
 
+**Post-audit correction (Round 9).** A final audit found that `build_H_full`'s
+electric-field term and `build_operators`' `Q_tot`/`N_0`/`N_1` used the opposite
+occupation convention (bit=1 occupied) from the chemical-potential term,
+`build_H_subspace` and `make_psi0` (bit=0 occupied). Exact spectra were
+unaffected (the two Hamiltonians are isospectral on the physical sector), but
+the energy of any non-eigenstate, every noisy-VQE energy, and the `N_0`/`N_1`
+diagnostics were. Both functions were fixed (`(I+Z)/2`), every affected
+experiment was rerun, and all figures were regenerated. **The corrected figures
+are in `pra_figures/`; `final_figs/`, `final_figures_pra/` and `submission/` hold
+pre-fix versions and are superseded.** All pre-fix outputs are kept unmodified
+in `results/pre_fix_backup/` for the record. The frozen "Corrections" prose in
+`results/SUMMARY.md` still quotes pre-fix numbers as historical record.
+
 What is reproducible from this repository: every headline number in
 `results/SUMMARY.md` (via `analysis/make_summary.py` over the committed
 `results/*.csv`), the full pytest suite including the noiseless validation
@@ -62,7 +75,9 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Developed and tested on Python 3.13, Windows. `qiskit-aer`'s
+Developed and tested on Python 3.13, Windows. The Round-9 runs reported
+qiskit 2.5.0 / qiskit-aer 0.17.2 in their job metadata (newer than the pins in
+`requirements.txt`). `qiskit-aer`'s
 `AerSimulator(method="density_matrix")` is the noisy-circuit backend for
 every train-noisy result in this repo; it runs on CPU, no GPU or IBM Quantum
 account is required. Dense-matrix simulation caps the reachable system size
@@ -70,18 +85,30 @@ at `nq<=8` (`N<=4`), which is why the noisy sweeps stop at `N=4` even though
 the exact-diagonalization code (`schwinger.core`) scales further, to `N=6`,
 for the noiseless reference table.
 
+Only the optional `experiments/ibm_taskB_*.py` scripts need an IBM Quantum
+account (`pip install -r requirements-hardware.txt`, and an account saved
+locally with `QiskitRuntimeService.save_account(...)`). No credentials, tokens
+or instance identifiers are stored in this repository; the scripts call
+`QiskitRuntimeService()` with no arguments and read your saved account.
+
 ## Repository layout
 
 ```
 schwinger/      core simulation library (see below)
-experiments/    sweep scripts that produce results/*.csv (exp01-exp14, plus
-                two helpers: seed_hysteresis_ascending.py, _par_test_worker.py)
+experiments/    sweep scripts that produce results/*.csv (exp01-exp16, plus
+                helpers: seed_hysteresis_ascending.py, _par_test_worker.py) and
+                the Round-9 controls / IBM hardware scripts (see below)
 analysis/       post-processing: make_summary.py (-> results/SUMMARY.md) and
                 the analyze_*.py / check_boundary.py scripts it draws on
 figures/        figure-generating scripts (see the figure map below)
 results/        every experiment's output: *.csv plus *_checkpoint.json (raw
-                data and provenance; never regenerate by deleting these)
-final_figs/     generated PNGs
+                data and provenance; never regenerate by deleting these).
+                results/README.md explains which hardware results are valid;
+                results/pre_fix_backup/ holds pre-fix outputs, kept for the record
+pra_figures/    FINAL figures (Figs. 1-7), regenerated from corrected data
+final_figs/     SUPERSEDED (pre-fix PNGs)
+final_figures_pra/  SUPERSEDED (pre-fix PNGs; has its own README saying so)
+submission/     SUPERSEDED (pre-fix copies of the seven figures)
 notebooks/      the exploratory, pre-refactor Jupyter notebooks this codebase
                 was extracted from, and their superseded figure output
                 (notebooks/legacy_figs/); kept for provenance, not part of
@@ -162,9 +189,14 @@ methodological assumption changed between rounds.
 
 ## Figures
 
-All seven figures are extracted from the notebooks as standalone
-`figures/make_fig*.py` scripts, and re-run to regenerate their PNGs in
-`final_figs/`. In-panel subplot titles were removed in Round 8 at a
+All seven figures are standalone `figures/make_fig*.py` scripts. **They now
+write to `pra_figures/`** (the final, corrected set for the manuscript);
+`final_figs/` is superseded. Fonts are set globally in `figures/style.py`
+(axis labels 11 pt, tick labels 9.5 pt; legends 8 pt and in-plot annotations
+7 pt are set in each script). To check print-size legibility run
+`bash figures/_render_test.sh <fig_basename> full` (or `col` for the
+single-column Fig. 7), which renders the PNG into a two-column revtex test
+page. In-panel subplot titles were removed in Round 8 at a
 reviewer's request; the panels now carry only bare (a)/(b)/... labels and
 all descriptive text lives in the manuscript captions. Reproduction is
 checked by confirming each script's printed diagnostics are unchanged, not
@@ -178,13 +210,16 @@ optimizer in the loop.
 
 | figure | script | what it plots |
 |---|---|---|
-| Fig. 1 | `figures/make_fig1.py` | `fig1_baseline.png`: Hilbert-space growth, ground-state entanglement entropy, finite-size energy per site (exact diagonalization, N=2..6) |
-| Fig. 2 | `figures/make_fig2.py` | `fig2_expressibility.png`: relative energy error vs depth, the p/d collapse, and the expressibility-derived hardware cost (N=2,3 re-run VQE; N=4,5,6 from the notebook's `precomputed` table) |
-| Fig. 3 | `figures/make_fig3.py` | `fig3_ksweep.png`: GI vs HW across a 33-point K-sweep -- energy, charge-sector leakage, fidelity, flavor numbers, error (re-runs VQE, ~10 min) |
-| Fig. 4 | `figures/make_fig4.py` | `fig4_penalty.png`: HW-ansatz charge-penalty sweep at K=-14 -- energy, leakage, fidelity vs lambda |
-| Fig. 5 | `figures/make_fig5.py` | `fig5_stability_convergence.png`: optimization-stability violin plots over 20 restarts plus best-of-5 convergence traces (merges the pre-refactor Figs. 5 and 6) |
-| Fig. 6 | `figures/make_fig6.py` | `fig6_phase_boundary.png`: exact, post-hoc-noisy, post-hoc-ZNE, and in-loop noisy energy curves side by side, with the located phase boundary marked |
-| Fig. 7 | `figures/make_fig7.py` | `fig7_zne_robustness.png`: ZNE residual vs per-CNOT depolarizing strength at the N=3 boundary (analytic) |
+| Fig. 1 | `python figures/make_fig1.py` | `pra_figures/fig1_baseline.png`: Hilbert-space growth, ground-state entanglement entropy, finite-size energy per site (exact diagonalization, N=2..6) |
+| Fig. 2 | `python figures/make_fig2.py` | `pra_figures/fig2_expressibility.png`: relative energy error vs depth, the p/d collapse, and the expressibility-derived hardware cost (N=2,3 re-run VQE live; N=4,5,6 are the hardcoded `PRECOMPUTED` values, regenerated as best of 24 restarts, seeds 42-45, by `experiments/regen_precomputed_fig2.py` then `experiments/regen_precomputed_convergence.py`; output `results/precomputed_N456_convergence.json`). Panel (c) plots two-qubit depth `4L+4N-6` (the sequential gate ordering used throughout) |
+| Fig. 3 | `python figures/make_fig3.py` | `pra_figures/fig3_ksweep.png`: GI vs HW across a 33-point K-sweep -- energy, charge-sector leakage, fidelity, flavor numbers, error (re-runs VQE, roughly 15-25 min) |
+| Fig. 4 | `python figures/make_fig4.py` | `pra_figures/fig4_penalty.png`: HW-ansatz charge-penalty sweep at K=-14 -- energy, leakage, fidelity vs lambda |
+| Fig. 5 | `python figures/make_fig5.py` | `pra_figures/fig5_stability_convergence.png`: optimization-stability violin plots over 20 restarts plus best-of-5 convergence traces (merges the pre-refactor Figs. 5 and 6) |
+| Fig. 6 | `python figures/make_fig6.py` | `pra_figures/fig6_phase_boundary.png`: exact, post-hoc-noisy, post-hoc-ZNE, and in-loop noisy energy curves side by side, with the located phase boundary marked |
+| Fig. 7 | `python figures/make_fig7.py` | `pra_figures/fig7_zne_robustness.png`: ZNE residual vs per-CNOT depolarizing strength at the N=3 boundary (analytic) |
+
+`figures/make_fig8_circuit.py` draws the N=3, L=2 ansatz circuit (logical and
+heavy-hex-transpiled); it is not a manuscript figure and is not in `pra_figures/`.
 
 `final_figs/fig8_zne_robustness.png` is a stale artifact of the pre-merge
 figure numbering (before the old Figs. 5 and 6 were merged into one, every
@@ -192,11 +227,9 @@ later figure was one higher). It is the same plot as Fig. 7 with a "Figure 8"
 title. It is left in `final_figs/` rather than deleted; its generator lives
 at `notebooks/legacy_figs/make_fig8_legacy.py`, not in `figures/`.
 
-`submission/` is the flat folder staged for journal upload: the seven paper
-figures copied from `final_figs/` (not moved -- `final_figs/` stays the
-scripts' output target) alongside `main.tex`. It is generated, not
-hand-maintained: refresh it by re-running the `make_fig*.py` scripts and
-re-copying. The stale pre-merge PNGs are deliberately not in it.
+`submission/` was the flat folder staged for journal upload. It still holds the
+**pre-fix** copies of the seven figures (and no `main.tex`); it is superseded by
+`pra_figures/` and must be refreshed from there before any upload.
 
 ## Tests
 
@@ -206,6 +239,10 @@ python -m pytest -m slow              # also runs the validation gate and the ex
                                        #   checks up to N=6 (several minutes total, mostly the gate)
 python -m pytest tests/test_reproduce_paper_numbers.py
 ```
+
+`tests/test_noisy_sim.py` and `tests/test_qiskit_backend.py` are standalone
+check scripts (not collected by pytest); run them from `tests/` with the repo
+root on `PYTHONPATH`, e.g. `cd tests && PYTHONPATH=.. python test_qiskit_backend.py`.
 
 - `test_hamiltonian.py`: `[Q_tot, H] = 0` as an operator identity (not just
   on one state), sector dimension `C(2N,N)` against the actual physical
@@ -220,20 +257,20 @@ python -m pytest tests/test_reproduce_paper_numbers.py
   including `test_retained_fraction_both_branches` (Round 7): the paper's
   Section VI C slope-mixture retained-fraction solve,
   `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)`, giving
-  1.005 (100.5%) on the ordered branch and 0.920 on the saturated branch.
-  This was `xfail` through Round 6 (the formula was not in the codebase and
-  two guessed definitions both failed); the confirmed formula lands both
-  branches in `[0.91, 1.02]` (the assertion bound is not the tighter
-  `[0.92, 1.01]` because the saturated branch is 0.91992, just under a
-  nominal 0.92, and the ordered branch is genuinely above 1) and the
-  assertion now runs.
+  1.082 (108.2%) on the ordered branch (1.005 before the Round-9 operator fix)
+  and 0.920 on the saturated branch. This was `xfail` through Round 6 (the
+  formula was not in the codebase and two guessed definitions both failed);
+  both branches land in `[0.91, 1.10]` (the saturated branch is 0.91992, just
+  under a nominal 0.92, and the ordered branch is genuinely above 1) and the
+  assertion runs. The other expected values in this file were updated to the
+  corrected (post-Round-9) results.
 
 ### Bug fix: `boundary_K`
 
 `schwinger.core.boundary_K` located the first-order phase boundary as the
 single largest jump in `dE/dK` over a scanned grid. At `N=4` there are two
 flavor-0 occupation level crossings in range, at `K~2.5` (`N_0: 2->3`) and
-`K~6.4` (`N_0: 3->4`), and they produce exactly equal slope jumps
+`K~6.4` (`N_0: 3->4`, pre-fix vacancy-count labels; `2->1` and `1->0` after the fix), and they produce exactly equal slope jumps
 (`4.000000`, bit-for-bit identical, not just numerically close, because each
 crossing adds the same fixed `-2*sqrt(x)` contribution to `dE/dK`
 regardless of which occupation level it happens at). `np.argmax`'s
@@ -251,12 +288,17 @@ returns every crossing found as a list, not just the terminal one, so
 downstream code that wants the full transition structure (as
 `results/boundary_check.md` does) doesn't need to re-derive it.
 
-`experiments/exp03_N4_spot.py`'s existing output
-(`results/noisy_N4_spot.csv`) was produced against the old, buggy
-`boundary_K(N=4)=2.5` and is deliberately not rerun, so that history isn't
-silently rewritten; see that script's docstring and
-`results/boundary_check.md` for how to read its K-point labels correctly
-given the old boundary value.
+`experiments/exp03_N4_spot.py` originally derived its K points from the old,
+buggy `boundary_K(N=4)=2.5`. In Round 9 it was rerun with K pinned to
+0, 1.25 and 2.5 (labels "K=0", "interior", "boundary" are historical; these are
+low-K points, not the phase boundary at 6.4) so it matches
+`noiseless_N4_control.csv` at the same K values; the pre-rerun output is in
+`results/pre_fix_backup/`. `boundary_K` returns grid-resolved values; the exact
+ground-state level crossings, from the piecewise-linear sector energies
+`E_n(K) = g_n + 2*sqrt(x)*n*K`, are at `|K| = 3.9456` (N=2), `5.5708` (N=3; plus a
+real crossing at K=0) and `6.3648` (N=4; also 2.4573). Level labels `N_0` in
+this section use the corrected particle-number convention (N=4: `2->1` at
+2.46, `1->0` at 6.36).
 
 ## Results (headline numbers)
 
@@ -266,38 +308,38 @@ full reasoning and audit history behind each one:
 
 - **In-loop vs post-hoc noisy estimate (N=3).** The mean relative gap
   between the in-loop-trained noisy energy and the post-hoc analytic
-  contraction, in the central phase (`|K|<=4`), grows from 5.3% at `p=0.01`
-  to 43.3% at `p=0.05`. The post-hoc contraction is not a substitute for
+  contraction, in the central phase (`|K|<=4`), grows from 5.8% at `p=0.01`
+  to 42.8% at `p=0.05`. The post-hoc contraction is not a substitute for
   actually training against the noisy circuit; the gap widens with noise
   strength rather than staying roughly constant.
 - **Kink suppression (Round 7, bidirectional-hysteresis check, N=3, L=3,
-  p=0.01).** 12.3% raw suppression of the transition's slope drop under
-  noise, reported alongside the paper's Section VI C retained-fraction pair:
-  `w_eff = 0.920` on the saturated branch and `1.005` (100.5%) on the
-  ordered branch, from the slope-mixture solve
+  p=0.01).** 16.2% raw suppression of the transition's slope drop under
+  noise (12.3% before the Round-9 fix), reported alongside the paper's Section
+  VI C retained-fraction pair: `w_eff = 0.920` on the saturated branch and
+  `1.082` (108.2%) on the ordered branch, from the slope-mixture solve
   `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)` (both in
-  `[0.91, 1.02]`). Both branches retain essentially the full exact slope,
+  `[0.91, 1.10]`). Both branches retain essentially the full exact slope,
   far above the passive-mixing `w_eff = 0.732`. (Round 6's baseline-adjusted -27.9% figure
   is withdrawn -- it double-counted the mixing correction; see
   `results/SUMMARY.md` Corrections, Round 7.)
-- **In-loop ZNE boundary residuals.** 0.86, 1.23, and 4.14 (energy units) at
+- **In-loop ZNE boundary residuals.** 0.84, 1.20, and 4.02 (energy units) at
   `p=0.01, 0.02, 0.05` respectively, versus a post-hoc reference of 3.8,
   10.5, and 33 at the same three noise strengths: in-loop training combined
   with linear Richardson extrapolation removes most of the residual error
   the post-hoc estimate leaves behind.
-- **N=4 noiseless restart-budget control.** Mean 0.24% error at the three
+- **N=4 noiseless restart-budget control.** Mean 0.12% error at the three
   K-points matched to `noisy_N4_spot.csv`'s own K grid, with the same
   restart budget. This confirms the degradation reported there is genuinely
   attributable to noise, not to an under-provisioned restart budget at
   N=4's larger, 75-parameter circuit.
 - **Gradient variance** (mean-squared gradient over 20 random parameter
   points, `L=2`, central finite differences). GI: 24.15, 23.02, and 21.19 at
-  N=2, 3, and 4 respectively. HW: 10.15, 5.50, and 2.38 at the same three N.
+  N=2, 3, and 4 respectively. HW: 10.47, 5.35, and 2.41 at the same three N.
   GI's gradient variance decays far more slowly with system size than HW's,
   consistent with charge conservation protecting it from the barren-plateau
   suppression HW is exposed to.
 - **L=2 vs L=3 expressibility near the N=3 boundary (K=4.5).** L=2 stays
-  65.2% wrong even at 32 restarts and `maxiter=4000`, a genuine
+  74.4% wrong even at 32 restarts and `maxiter=4000`, a genuine
   expressibility limit rather than optimizer under-convergence (more
   restarts at the same depth do not close the gap). L=3 recovers the same
   point to 0.080% error at only 8 restarts, confirming the failure was
@@ -308,3 +350,47 @@ audit-driven fixes behind these numbers in full: what was wrong, how it was
 diagnosed, what was run to check it, and what changed as a result, with
 every superseded or provisional figure kept in place and explicitly
 annotated rather than deleted.
+
+## Round-9 controls, diagnostics and hardware scripts
+
+New in the final pre-submission round (all read-only with respect to saved
+results; outputs go to new files):
+
+| script | purpose | output |
+|---|---|---|
+| `experiments/exp15_l2_full_sweep_noiseless.py` | L=2 noiseless best-of-8 over K in [-16,16] (regenerates the full-range L=2 error profile) | `results/l2_full_sweep_N3_noiseless.csv` |
+| `experiments/exp16_l3_failure_region.py` | L=3 at K=1..5, the region where L=2 fails | `results/l3_failure_region_N3.csv` |
+| `experiments/regen_precomputed_fig2.py`, `experiments/regen_precomputed_convergence.py` | Table IV / Fig. 2 values for N=4,5,6: 6-restart seed-42 batch, then three more batches (seeds 43-45); best of 24 restarts | `results/precomputed_N456.json`, `results/precomputed_N456_convergence.json` |
+| `experiments/posthoc_local_control.py` | post-hoc control with the *same local noise channel* as the in-loop runs: noiseless-optimal theta* per K (saved), evaluated under `NoisyEvaluator` at p=0.01 with no re-optimization; env vars `POSTHOC_SEED_BASE`, `POSTHOC_TAG` select the seed | `results/posthoc_local_theta_N3_L3*.json`, `results/posthoc_local_control_N3_L3*.json` |
+| `experiments/posthoc_local_ensemble.py` | the same control over all equally-good noiseless restarts (bootstrap of the theta* choice), since a single theta* is not unique | `results/posthoc_local_ensemble_*.json` |
+| `experiments/odd_N_fidelity_check.py` | odd-N K=0 ground space is degenerate: recomputes K=0 fidelities against the projector onto the full ground space | `results/odd_N_fidelity_check.json` |
+| `experiments/diagnose_build_H_full_bug.py` | reproduces the operator bug (exact ground state scored through `NoisyEvaluator`); passes after the fix | stdout |
+| `experiments/_compare_postfix.py`, `experiments/_run_postfix_batch*.sh`, `experiments/_run_exp03_exp12.sh` | compare pre- and post-fix CSVs; the batch runners used for the reruns | stdout / `results/postfix_run_logs/` |
+
+The same-channel control in `posthoc_local_*.json` is highly theta*-dependent,
+so read the ensemble summary rather than any single draw when comparing
+in-loop and post-hoc results.
+
+### IBM hardware (ibm_marrakesh), N=3, L=2, K=0, fixed theta
+
+`results/theta_N3_L2_K0.json` holds the noiselessly optimized theta used for
+every hardware run (no re-optimization on hardware).
+
+| script | purpose | output |
+|---|---|---|
+| `experiments/ibm_taskB_step1_theta.py` | optimize theta at K=0 (paper's fig-2 budget) and save it | `results/theta_N3_L2_K0.json` |
+| `experiments/ibm_taskB_step2_references.py` | exact / noiseless / depolarizing+SPAM reference energies | `results/ibm_N3_L2_K0_references.json` |
+| `experiments/ibm_taskB_step3_plan.py` | Pauli grouping, transpile, QPU-time plan (no submission) | `results/ibm_N3_L2_K0_plan.json` |
+| `experiments/ibm_taskB_step4_submit.py` | the SamplerV2 hardware job (with a local noiseless self-test first) | `results/ibm_N3_L2_K0.json` |
+| `experiments/ibm_taskB_readout_correct.py` | classical tensored readout correction of that job's counts | `results/ibm_N3_L2_K0_readout_corrected.json` |
+| `experiments/ibm_taskB_mitigated_plan.py`, `ibm_taskB_mitigated_submit.py` | EstimatorV2 baseline / readout / readout+ZNE jobs | `results/ibm_N3_L2_K0_mitigated*.json` (**invalid**, see below) |
+| `experiments/ibm_taskB_drift_check.py` | interleaved Sampler/Estimator batch that exposed the discrepancy | `results/ibm_N3_L2_K0_drift_check.json` |
+| `experiments/ibm_taskB_gap_localize.py` | per-group Sampler vs Estimator comparison localizing the defect | `results/ibm_N3_L2_K0_gap_localize.json` |
+| `experiments/_pipeline_asymmetric_test.py`, `_diag_AB.py` | noiseless pipeline validation on asymmetric states; ISA-circuit / per-group diagnostics | stdout |
+
+**Which hardware results are valid.** The EstimatorV2 runs (Job 0, Jobs A/B,
+E1/E2) are invalid: the runtime returned 0 +/- 0 for the Y-Z-Y observable group
+on physical qubits (8,9,10),(10,11,18), so each energy is missing about 9.5
+units. The SamplerV2 runs (job 1, S1, S2, and D in the gap-localization file)
+are valid; their raw counts are in `results/ibm_N3_L2_K0_sampler_counts.json`.
+See `results/README.md` and each file's top-level `"status"` field.

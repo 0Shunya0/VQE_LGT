@@ -17,19 +17,12 @@ from scipy.linalg import eigh
 import matplotlib.pyplot as plt
 
 import schwinger.core as core
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 X = 16.0
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
-
-
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
+style.apply()
 
 
 def exact_data_table():
@@ -52,7 +45,7 @@ def main():
     os.makedirs(FIG_DIR, exist_ok=True)
     exact_data = exact_data_table()
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+    fig, axes = plt.subplots(1, 3, figsize=(style.FULL_WIDTH, 2.3))
     N_vals = list(exact_data.keys())
     Q0_dims = [exact_data[N]['Q0'] for N in N_vals]
     S_vals = [exact_data[N]['S_half'] for N in N_vals]
@@ -61,32 +54,37 @@ def main():
     ax = axes[0]
     ax.bar(N_vals, Q0_dims, color='steelblue', edgecolor='k', lw=0.7, alpha=0.85)
     for N, d in zip(N_vals, Q0_dims):
-        ax.text(N, d + 5, str(d), ha='center', fontsize=11, fontweight='bold')
+        ax.text(N, d + 5, str(d), ha='center', fontsize=7, fontweight='bold')
     for L, col in [(1, 'red'), (2, 'orange'), (3, 'green')]:
         for iN, N in enumerate(N_vals):
             nq = N * 2; p = L * (nq - 1 + nq)
-            ax.plot([N - 0.4, N + 0.4], [p, p], '-', color=col, lw=2, alpha=0.8,
-                    label=f'L={L} params' if iN == 0 else '')
-    ax.set_xlabel('Lattice sites N'); ax.set_ylabel('Q_tot=0 sector dimension')
-    _panel(ax, '(a)')
+            ax.plot([N - 0.4, N + 0.4], [p, p], '-', color=col, lw=1.2, alpha=0.8,
+                    label=f'L={L}' if iN == 0 else '')
+    ax.set_xlabel('N'); ax.set_ylabel(r'dim $Q_{\mathrm{tot}}=0$')
+    ax.set_ylim(top=max(Q0_dims) * 1.22)
+    style.panel_label(ax, '(a)')
     ax.legend(fontsize=8, loc='upper left'); ax.set_xticks(N_vals)
 
     ax = axes[1]
-    ax.plot(N_vals, S_vals, 'purple', marker='s', lw=2.5, ms=10, markeredgecolor='k')
+    ax.plot(N_vals, S_vals, 'purple', marker='s', lw=1.2, ms=4, markeredgecolor='k')
     for N, S in zip(N_vals, S_vals):
-        ax.text(N + 0.07, S + 0.01, f'{S:.3f}', fontsize=9)
-    ax.axhline(np.log(2), color='gray', ls='--', lw=1.5, label='ln2 = 0.693')
-    ax.axhline(np.log(4), color='gray', ls=':', lw=1.5, label='ln4 = 1.386')
-    ax.set_xlabel('Lattice sites N'); ax.set_ylabel('Half-system entropy S (nats)')
-    _panel(ax, '(b)')
-    ax.legend(fontsize=8); ax.set_xticks(N_vals)
+        ax.text(N + 0.07, S + 0.01, f'{S:.3f}', fontsize=7)
+    ax.axhline(np.log(2), color='gray', ls='--', lw=1.0, zorder=2.5, label=r'$\ln 2 = 0.693$')
+    ax.axhline(np.log(4), color='#555555', ls=':', lw=1.2, zorder=2.5, label=r'$\ln 4 = 1.386$')
+    ax.set_xlabel('N'); ax.set_ylabel('S (nats)')
+    ax.set_xlim(min(N_vals) - 0.3, max(N_vals) + 0.9)
+    ax.set_ylim(np.log(2) - 0.12, max(S_vals) + 0.15)
+    style.panel_label(ax, '(b)')
+    ax.legend(fontsize=8, loc='lower center'); ax.set_xticks(N_vals)
 
     ax = axes[2]
-    ax.plot(N_vals, EpN, 'ko-', lw=2.5, ms=10, markeredgecolor='k')
+    ax.plot(N_vals, EpN, 'ko-', lw=1.2, ms=4, markeredgecolor='k')
     for N, E in zip(N_vals, EpN):
-        ax.text(N + 0.07, E - 0.3, f'{E:.2f}', fontsize=9)
-    ax.set_xlabel('Lattice sites N'); ax.set_ylabel('E_exact / N')
-    _panel(ax, '(c)')
+        ax.text(N + 0.13, E - 0.3, f'{E:.2f}', fontsize=7)
+    ax.set_xlabel('N'); ax.set_ylabel(r'$E_0/N$')
+    ax.set_xlim(min(N_vals) - 0.3, max(N_vals) + 0.9)
+    ax.set_ylim(min(EpN) - 0.6, max(EpN) + 0.35)
+    style.panel_label(ax, '(c)')
     ax.set_xticks(N_vals)
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig1_baseline.png")

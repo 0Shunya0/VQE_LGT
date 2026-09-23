@@ -525,7 +525,9 @@ def _q2_l3_hysteresis_attempt():
             f"dE_inloop/dK={slopes['pre-transition']['slope_ny']:.4f}  ->  w_eff={rf['ordered']:.3f}",
             f"        saturated branch (K in {POST_RANGE}): dE_exact/dK={slopes['post-transition']['slope_nl']:.4f}, "
             f"dE_inloop/dK={slopes['post-transition']['slope_ny']:.4f}  ->  w_eff={rf['saturated']:.3f}",
-            f"        Both land in [0.91, 1.02] (ordered 1.005 = 100.5%, saturated 0.920): the "
+            f"        Ordered {rf['ordered']:.3f} ({100 * rf['ordered']:.1f}%), saturated {rf['saturated']:.3f}"
+            f" ({'both above' if min(rf['ordered'], rf['saturated']) > w_eff else 'AT LEAST ONE BELOW'} the "
+            f"passive-mixing baseline {w_eff:.4f}): the "
             f"in-loop-trained noisy branches retain essentially the full exact slope, far above the "
             f"passive-mixing w_eff=0.7323. The saturated branch is informative here (not degenerate) "
             f"because dE_mix/dK is nonzero where dE_exact/dK is flat.",

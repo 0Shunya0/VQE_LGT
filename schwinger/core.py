@@ -126,7 +126,7 @@ def build_H_full(x, K, N=2, F=2, convention=CONVENTION_DEFAULT):
         for k in range(ne + 1):
             for f in range(F):
                 q = k * F + f
-                cumQ += (Imat - _single_Z(q, nq)) / 2
+                cumQ += (Imat + _single_Z(q, nq)) / 2
             cumQ -= F / 2.0 * (1 - (-1) ** k) * Imat
         H += cumQ @ cumQ
     return H
@@ -341,10 +341,10 @@ def build_operators(N=2, F=2):
     nq = N * F
     dim = 2 ** nq
     Imat = np.eye(dim, dtype=complex)
-    Q_tot = sum((Imat - _single_Z(q, nq)) / 2 for q in range(nq)) - (nq // 2) * Imat
+    Q_tot = sum((Imat + _single_Z(q, nq)) / 2 for q in range(nq)) - (nq // 2) * Imat
     Q2 = Q_tot @ Q_tot
-    N0 = sum((Imat - _single_Z(n * F + 0, nq)) / 2 for n in range(N))
-    N1 = sum((Imat - _single_Z(n * F + 1, nq)) / 2 for n in range(N))
+    N0 = sum((Imat + _single_Z(n * F + 0, nq)) / 2 for n in range(N))
+    N1 = sum((Imat + _single_Z(n * F + 1, nq)) / 2 for n in range(N))
     return Q_tot, Q2, N0, N1
 
 

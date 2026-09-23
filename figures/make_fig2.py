@@ -21,32 +21,25 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
 import schwinger.core as core
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 X = 16.0
 R = dict(ksweep=8, penalty=10, stability=20, scaling=6, conv=5, maxiter=2500)
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
+style.apply()
 
 
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
-
-
-# Verified longer VQE runs for N=4,5,6 (notebook's hardcoded `precomputed`).
+# Regenerated post-fix: best of 24 restarts, seeds 42-45 (4 independent
+# 6-restart batches of core.run_vqe_scaling, maxiter=2500); see
+# results/precomputed_N456_convergence.json.
 PRECOMPUTED = {
     4: dict(E_exact=-68.5764, Q0=70, S_half=0.8042, nq=8,
-            layers=[(1, 15, -35.0596, 48.88), (2, 30, -62.6228, 8.68),
-                    (3, 45, -66.3934, 3.18), (4, 60, -68.5000, 0.11),
-                    (5, 75, -68.5620, 0.021)]),
+            layers=[(1, 15, -35.0596, 48.875), (2, 30, -62.8888, 8.294), (3, 45, -66.5798, 2.912), (4, 60, -68.5420, 0.050), (5, 75, -68.5635, 0.019)]),
     5: dict(E_exact=-84.0895, Q0=252, S_half=1.0006, nq=10,
-            layers=[(1, 19, -44.3013, 47.31), (2, 38, -74.1872, 11.78)]),
-    6: dict(E_exact=-107.3030, Q0=924, S_half=1.4056, nq=12,
-            layers=[(1, 23, -55.4002, 48.36)]),
+            layers=[(1, 19, -45.7461, 45.598), (2, 38, -78.4617, 6.693)]),
+    6: dict(E_exact=-107.303, Q0=924, S_half=1.4056, nq=12,
+            layers=[(1, 23, -57.1559, 46.734)]),
 }
 
 
@@ -80,8 +73,8 @@ def main():
     for N in (4, 5, 6):
         all_data[N] = PRECOMPUTED[N]
 
-    fig = plt.figure(figsize=(16, 5))
-    gs = gridspec.GridSpec(1, 3, figure=fig, wspace=0.32)
+    fig = plt.figure(figsize=(style.FULL_WIDTH, 2.3))
+    gs = gridspec.GridSpec(1, 3, figure=fig, wspace=0.55)
     ax1, ax2, ax3 = fig.add_subplot(gs[0]), fig.add_subplot(gs[1]), fig.add_subplot(gs[2])
     colors = {2: '#1f77b4', 3: '#d62728', 4: '#2ca02c', 5: '#9467bd', 6: '#8c564b'}
     markers = {2: 'o', 3: 's', 4: '^', 5: 'D', 6: 'P'}
@@ -90,41 +83,44 @@ def main():
         Lv = [t[0] for t in d['layers']]
         ev = [max(t[3], 5e-3) for t in d['layers']]
         pv = [t[1] for t in d['layers']]
-        ax1.semilogy(Lv, ev, color=colors[N], marker=markers[N], lw=2.5, ms=9,
+        ax1.semilogy(Lv, ev, color=colors[N], marker=markers[N], lw=1.2, ms=4,
                      markeredgecolor='k', label=f'N={N}')
         Lth = d['Q0'] / n_per
         if Lth <= max(Lv) + 1:
-            ax1.axvline(Lth, color=colors[N], ls=':', lw=1.5, alpha=0.6)
+            ax1.axvline(Lth, color=colors[N], ls=':', lw=1.0, alpha=0.6)
         ax2.semilogy([p / d['Q0'] for p in pv], ev, color=colors[N], marker=markers[N],
-                     lw=2.5, ms=9, markeredgecolor='k', label=f'N={N}')
-    ax1.axhline(1.0, color='gray', ls='--', lw=1.5, label='1% target')
-    ax1.set_xlabel('Ansatz layers L'); ax1.set_ylabel('Relative energy error (%)')
-    _panel(ax1, '(a)')
-    ax1.legend(fontsize=9)
+                     lw=1.2, ms=4, markeredgecolor='k', label=f'N={N}')
+    ax1.axhline(1.0, color='gray', ls='--', lw=1.0, label='1% target')
+    ax1.set_xlabel('L'); ax1.set_ylabel('Error (%)')
+    style.panel_label(ax1, '(a)')
     ax1.set_xticks([1, 2, 3, 4, 5])
-    ax2.axvline(1.0, color='k', ls='--', lw=2, alpha=0.8, label='p/d = 1')
-    ax2.axhline(1.0, color='gray', ls='--', lw=1.5)
-    ax2.set_xlabel('p/d  (params / sector dimension)'); ax2.set_ylabel('Relative energy error (%)')
-    _panel(ax2, '(b)')
-    ax2.legend(fontsize=9)
+    ax2.axvline(1.0, color='k', ls='--', lw=1.2, alpha=0.8, label='$p/d=1$')
+    ax2.axhline(1.0, color='gray', ls='--', lw=1.0)
+    ax2.set_xlabel('$p/d$'); ax2.set_ylabel('Error (%)')
+    style.panel_label(ax2, '(b)')
+    ax2.legend(fontsize=8, loc='upper right')
     N_c = [2, 3, 4, 5]
     Lmin = [math.ceil(comb(N * 2, N) / ((N * 2 - 1) + N * 2)) for N in N_c]
-    depth = [4 * L + 1 for L in Lmin]
+    depth = [4 * L + 4 * N - 6 for N, L in zip(N_c, Lmin)]
     bar_col = ['#2ca02c' if L <= 3 else '#ff7f0e' if L <= 10 else '#d62728' for L in Lmin]
     xp = np.arange(len(N_c)); ax3b = ax3.twinx()
     ax3.bar(xp, Lmin, color=bar_col, edgecolor='k', lw=0.7, alpha=0.85)
-    ax3b.plot(xp, depth, 'r^-', ms=9, lw=2.5, markeredgecolor='k')
+    ax3b.plot(xp, depth, 'r^-', ms=4, lw=1.2, markeredgecolor='k')
     for xi, L in enumerate(Lmin):
-        ax3.text(xi, L + 0.3, str(L), ha='center', fontsize=11, fontweight='bold')
-    ax3.set_xticks(xp); ax3.set_xticklabels([f'N={N}' for N in N_c])
-    ax3.set_xlabel('System size N'); ax3.set_ylabel('Min layers for completeness', color='k')
-    ax3b.set_ylabel('Circuit depth (4L+1)', color='red')
-    _panel(ax3, '(c)')
-    ax3.axhline(10, color='orange', ls=':', lw=2, alpha=0.8, label='~10L ion limit')
+        ax3.text(xi, L - 0.35, str(L), ha='center', va='top', fontsize=7,
+                 fontweight='bold', color='white')
+    ax3.set_ylim(top=max(Lmin) * 1.3)
+    ax3b.set_ylim(top=max(depth) * 1.18)
+    ax3.set_xticks(xp); ax3.set_xticklabels([str(N) for N in N_c])
+    ax3.set_xlabel('N'); ax3.set_ylabel('$L_{\\mathrm{min}}$', color='k')
+    ax3b.set_ylabel('Depth', color='red')
+    style.panel_label(ax3, '(c)')
+    ax3.axhline(10, color='orange', ls=':', lw=1.2, alpha=0.8, label='ion limit')
     ax3.legend(fontsize=8, loc='upper left')
     out_path = os.path.join(FIG_DIR, "fig2_expressibility.png")
     plt.savefig(out_path)
     print(f"Saved {out_path}")
+    print(f"  panel (c): N={N_c}  L_min={Lmin}  2q depth={depth}")
 
 
 if __name__ == "__main__":

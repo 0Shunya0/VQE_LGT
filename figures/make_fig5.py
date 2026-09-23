@@ -20,20 +20,13 @@ import matplotlib.pyplot as plt
 
 from schwinger.core import (build_H_full, build_operators, make_psi0,
                             measure_state, gauge_invariant_ansatz, hw_efficient_ansatz)
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 X = 16.0
 R = dict(ksweep=8, penalty=10, stability=20, scaling=6, conv=5, maxiter=2500)
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
-
-
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
+style.apply()
 
 
 def main():
@@ -77,25 +70,25 @@ def main():
     tr_gi = conv_trace(gauge_invariant_ansatz, H0, nq, 2, 14, psi0, n_tries=R['conv'])
     tr_hw = conv_trace(hw_efficient_ansatz, H0, nq, 2, 16, psi0, n_tries=R['conv'])
 
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4.2))
+    fig, axes = plt.subplots(1, 3, figsize=(style.FULL_WIDTH, 2.3))
     for ax, metric, ylabel, panel, ref, reflabel in [
-            (axes[0], 'E', 'Final energy', '(a)', E_q0_0, f'Exact: {E_q0_0:.2f}'),
-            (axes[1], 'fidelity', 'Fidelity', '(b)', 1.0, 'Perfect: 1.0')]:
+            (axes[0], 'E', 'Final energy', '(a)', E_q0_0, f'exact: {E_q0_0:.2f}'),
+            (axes[1], 'fidelity', 'Fidelity', '(b)', 1.0, 'perfect: 1.0')]:
         gv = [o[metric] for o in stability_data['GI']]; hv = [o[metric] for o in stability_data['HW']]
         vp = ax.violinplot([gv, hv], positions=[1, 2], showmeans=True, showmedians=True)
         vp['bodies'][0].set_facecolor('#1f77b4'); vp['bodies'][0].set_alpha(0.7)
         vp['bodies'][1].set_facecolor('#d62728'); vp['bodies'][1].set_alpha(0.7)
-        ax.axhline(ref, color='k', ls='--', lw=2, label=reflabel)
-        ax.set_xticks([1, 2]); ax.set_xticklabels(['Gauge-inv', 'HW-eff'])
-        ax.set_ylabel(ylabel); ax.legend(fontsize=8); _panel(ax, panel)
+        ax.axhline(ref, color='k', ls='--', lw=1.2, label=reflabel)
+        ax.set_xticks([1, 2]); ax.set_xticklabels(['GI', 'HW'])
+        ax.set_ylabel(ylabel); ax.legend(fontsize=8); style.panel_label(ax, panel)
     axc = axes[2]
-    axc.plot(range(len(tr_gi)), tr_gi, 'b-', lw=2.5, label='Gauge-invariant (14 params)')
-    axc.plot(range(len(tr_hw)), tr_hw, 'r-', lw=2.5, label='HW-efficient (16 params)')
-    axc.axhline(E_q0_0, color='k', ls='--', lw=2, label=f'Exact: {E_q0_0:.2f}')
+    axc.plot(range(len(tr_gi)), tr_gi, 'b-', lw=1.2, label='GI (14 params)')
+    axc.plot(range(len(tr_hw)), tr_hw, 'r-', lw=1.2, label='HW (16 params)')
+    axc.axhline(E_q0_0, color='k', ls='--', lw=1.2, label=f'exact: {E_q0_0:.2f}')
     band = abs(E_q0_0) * 0.01
     axc.fill_between(range(len(tr_gi)), E_q0_0 - band, E_q0_0 + band, alpha=0.15, color='green', label='1% band')
-    axc.set_xlabel('Optimization iteration'); axc.set_ylabel('VQE energy')
-    axc.legend(fontsize=8); _panel(axc, '(c)')
+    axc.set_xlabel('Iteration'); axc.set_ylabel('VQE energy')
+    axc.legend(fontsize=8); style.panel_label(axc, '(c)')
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig5_stability_convergence.png")
     plt.savefig(out_path)

@@ -15,13 +15,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import schwinger.core as core
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 
 N_noise, NCX, conv = 3, core.NCX_N3_L2, "nu0only"
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
+style.apply()
 
 
 def main():
@@ -33,13 +33,14 @@ def main():
     no = np.array([core.noisy(E0, Emix, p, NCX) for p in ps])
     zn = np.array([core.zne_linear(E0, Emix, p, NCX) for p in ps])
 
-    fig, ax = plt.subplots(figsize=(4.6, 3.2))
-    ax.axhline(E0 / N_noise, color='k', ls='--', label=f'exact ($E/N$={E0/N_noise:.2f})')
-    ax.plot(ps * 100, no / N_noise, 'o-', color='#d62728', ms=3, label='noisy')
-    ax.plot(ps * 100, zn / N_noise, 's-', color='#2ca02c', ms=3, label=r'ZNE ($\lambda=3$)')
+    fig, ax = plt.subplots(figsize=(style.COL_WIDTH, 2.6))
+    ax.axhline(E0 / N_noise, color='k', ls='--', label='exact')
+    ax.plot(ps * 100, no / N_noise, 'o-', color='#d62728', ms=2.5, label='noisy')
+    ax.plot(ps * 100, zn / N_noise, 's-', color='#2ca02c', ms=2.5, label='ZNE')
     ax.axvline(1.0, color='#1f77b4', ls=':'); ax.axvline(2.0, color='#ff7f0e', ls=':')
-    ax.set_xlabel('per-CNOT depolarizing $p$ (%)'); ax.set_ylabel(r'$E/N$ at boundary')
-    ax.legend(frameon=False)
+    ax.set_xlabel('$p$ (%)'); ax.set_ylabel('$E/N$')
+    ax.legend(frameon=False, fontsize=8, loc='lower right',
+              handlelength=1.3, handletextpad=0.4, borderaxespad=0.3, labelspacing=0.3)
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig7_zne_robustness.png")
     plt.savefig(out_path)

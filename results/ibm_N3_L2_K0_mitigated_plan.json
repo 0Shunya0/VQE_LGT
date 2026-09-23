@@ -1,0 +1,37 @@
+{
+  "jobA": {
+    "shots_per_circuit": 4096,
+    "est_circuits": 6,
+    "est_total_shots": 24576,
+    "est_qpu_s": 9.9504
+  },
+  "jobB": {
+    "shots_per_circuit": 4096,
+    "est_circuits": 11,
+    "est_total_shots": 45056,
+    "est_qpu_s": 18.2424
+  },
+  "total_est_qpu_s": 28.1928,
+  "n_cz": 20,
+  "depth": 70,
+  "physical_qubits": [
+    15,
+    14,
+    13,
+    12,
+    11,
+    10
+  ],
+  "readout_errors": {
+    "15": 0.0067138671875,
+    "14": 0.0101318359375,
+    "13": 0.021240234375,
+    "12": 0.00732421875,
+    "11": 0.011962890625,
+    "10": 0.0037841796875
+  },
+  "mean_readout_error": 0.01019287109375,
+  "paper_eps": 0.005,
+  "queue_len": 1,
+  "used_historical_calibration": true
+}

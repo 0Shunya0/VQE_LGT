@@ -1,0 +1,66 @@
+==============================================================================
+TASK A: IBM heavy-hex transpilation penalty study
+Target backend / coupling map: FakeSherbrooke (127q Eagle r3 heavy-hex snapshot; no live IBM credentials available in this environment)
+optimization_level=3, 20 seeds per circuit (seed_transpiler = 0..19)
+==============================================================================
+
+NOTE ON RESULT: the gauge-invariant ansatz is a strictly 1D nearest-
+neighbour chain. IBM's heavy-hex coupling graph is not a pure grid -- it
+contains long degree-2 'arms' between its degree-3 branch nodes (verified
+directly against FakeSherbrooke's coupling_map: physical qubits 121-126
+and 119-126 used below form genuine contiguous linear chains, each edge
+present in the coupling map). At the 6-8 qubit sizes studied here, the
+router (SabreLayout/SabreSwap, opt level 3) finds a zero-SWAP embedding
+onto one such arm for every seed tried. So the CNOT/ECR COUNT does NOT
+increase over the linear-chain assumption at these sizes -- the heavy-hex
+penalty for this specific ansatz shows up only as DEPTH inflation, from
+CX-to-ECR basis translation (each logical CX becomes 1 ECR + surrounding
+single-qubit gates), not from routing/SWAP overhead. This contradicts the
+premise that CNOT count must go up on heavy-hex for this circuit; a wider
+qubit count or a non-chain ansatz would be needed to see SWAP-driven CNOT
+growth. Reported here as found, not adjusted to match the expected story.
+
+--- N=3, L=2  (nq=6) ---
+Logical circuit: 132 total instructions, depth 53
+Logical two-qubit gate count: 20  (formula 2*L*(2N-1) = 2*2*(2*3-1) = 20)  MATCH=True
+Transpiled 2Q-gate (ECR/CX) count over 20 seeds: min=20  median=20.0  max=20
+Representative (median-count) run: depth=97, swaps_inserted=0, physical_qubits_used=[121, 122, 123, 124, 125, 126]
+Depth over seeds: min=97 median=97.0 max=97
+SWAPs inserted over seeds: min=0 median=0.0 max=0
+
+--- N=3, L=3  (nq=6) ---
+Logical circuit: 198 total instructions, depth 68
+Logical two-qubit gate count: 30  (formula 2*L*(2N-1) = 2*3*(2*3-1) = 30)  MATCH=True
+Transpiled 2Q-gate (ECR/CX) count over 20 seeds: min=30  median=30.0  max=30
+Representative (median-count) run: depth=126, swaps_inserted=0, physical_qubits_used=[121, 122, 123, 124, 125, 126]
+Depth over seeds: min=126 median=126.0 max=126
+SWAPs inserted over seeds: min=0 median=0.0 max=0
+
+--- N=4, L=5  (nq=8) ---
+Logical circuit: 460 total instructions, depth 112
+Logical two-qubit gate count: 70  (formula 2*L*(2N-1) = 2*5*(2*4-1) = 70)  MATCH=True
+Transpiled 2Q-gate (ECR/CX) count over 20 seeds: min=70  median=70.0  max=70
+Representative (median-count) run: depth=244, swaps_inserted=0, physical_qubits_used=[119, 120, 121, 122, 123, 124, 125, 126]
+Depth over seeds: min=244 median=244.0 max=244
+SWAPs inserted over seeds: min=0 median=0.0 max=0
+
+==============================================================================
+Cumulative infidelity  1 - (1-p)^n_CX
+==============================================================================
+case          n_CX(linear)  n_CX(heavy-hex,median)   penalty_ratio
+N=3, L=2                20                    20.0           1.000
+N=3, L=3                30                    30.0           1.000
+N=4, L=5                70                    70.0           1.000
+
+-- p = 0.001 --
+case            infid_linear   infid_heavyhex(min)   infid_heavyhex(med)   infid_heavyhex(max)  penalty_ratio(med)
+N=3, L=2             0.01981               0.01981               0.01981               0.01981               1.000
+N=3, L=3             0.02957               0.02957               0.02957               0.02957               1.000
+N=4, L=5             0.06764               0.06764               0.06764               0.06764               1.000
+
+-- p = 0.00117 --
+case            infid_linear   infid_heavyhex(min)   infid_heavyhex(med)   infid_heavyhex(max)  penalty_ratio(med)
+N=3, L=2             0.02314               0.02314               0.02314               0.02314               1.000
+N=3, L=3             0.03451               0.03451               0.03451               0.03451               1.000
+N=4, L=5             0.07868               0.07868               0.07868               0.07868               1.000
+

@@ -30,7 +30,10 @@ def seed_ascending_pass(kind):
             print(f"[{dest}] ascending pass already present, skipping copy.", flush=True)
             return
     df = pd.read_csv(SOURCE[kind])
-    df.insert(df.columns.get_loc("K_index") + 1, "direction", "up")
+    if "direction" not in df.columns:
+        df.insert(df.columns.get_loc("K_index") + 1, "direction", "up")
+    else:
+        df["direction"] = "up"
     df = df[CSV_FIELDS]
     write_header = not os.path.exists(dest)
     df.to_csv(dest, mode="a", header=write_header, index=False)

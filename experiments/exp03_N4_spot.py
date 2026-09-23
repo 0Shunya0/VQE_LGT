@@ -56,8 +56,10 @@ CSV_FIELDS = ["p", "K", "K_label", "restart", "seed", "energy", "E_exact",
 
 
 def k_points():
-    kb = core.boundary_K(N=N, convention="nu0only")
-    return [(0.0, "K=0"), (kb / 2, "interior"), (kb, "boundary")], kb
+    # Pinned to the K values the paper's N=4 noisy-vs-noiseless comparison uses
+    # (matched by exp07's 'noisy-matched-*' rows). The labels are historical:
+    # these are low-K points, not the boundary (boundary_K(N=4) = 6.4).
+    return [(0.0, "K=0"), (1.25, "interior"), (2.5, "boundary")], core.boundary_K(N=N, convention="nu0only")
 
 
 def load_checkpoint():
@@ -115,7 +117,7 @@ def main():
     os.makedirs(RESULTS_DIR, exist_ok=True)
     done_cells = load_checkpoint()
     kpts, kb = k_points()
-    print(f"N=4 phase boundary located at |K|={kb:.3f} (via schwinger_core.boundary_K)", flush=True)
+    print(f"K pinned to {[k for k,_ in kpts]}; true N=4 phase boundary |K|={kb:.3f} (not sampled here)", flush=True)
 
     cells = []
     for p_idx, p in enumerate(P_VALUES):

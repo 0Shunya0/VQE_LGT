@@ -19,20 +19,13 @@ import matplotlib.pyplot as plt
 import schwinger.core as core
 from schwinger.core import (build_H_full, build_operators, make_psi0, run_vqe,
                             measure_state, gauge_invariant_ansatz, hw_efficient_ansatz)
+import style
 
-FIG_DIR = "final_figs"
+FIG_DIR = "pra_figures"
 X = 16.0
 R = dict(ksweep=8, penalty=10, stability=20, scaling=6, conv=5, maxiter=2500)
 
-plt.rcParams.update({"font.family": "serif", "font.size": 9, "figure.dpi": 120,
-                     "savefig.bbox": "tight", "savefig.dpi": 150})
-
-
-def _panel(ax, label):
-    """Bare (a)/(b)/... panel label, top-left, just above the axes frame.
-    Descriptive text lives in the manuscript caption, not on the figure."""
-    ax.text(0.0, 1.02, label, transform=ax.transAxes, va="bottom", ha="left",
-            fontweight="bold", fontsize=10)
+style.apply()
 
 
 def main():
@@ -64,35 +57,42 @@ def main():
         sweep['n1_gi'].append(og['N1']); sweep['n1_hw'].append(oh['N1'])
         sweep['fid_gi'].append(og['fidelity']); sweep['fid_hw'].append(oh['fidelity'])
     print(f"  done in {time.time() - t0:.0f}s")
-    fig, axes = plt.subplots(2, 3, figsize=(16, 10)); K = K_vals
+    print("  K sweep: qt2_hw, fid_hw per point")
+    for k, q2, f in zip(K_vals, sweep['qt2_hw'], sweep['fid_hw']):
+        print(f"    K={k:7.3f}  qt2_hw={q2:8.4f}  fid_hw={f:8.4f}")
+    fid_hw = sweep['fid_hw']
+    crossings = [(K_vals[i], K_vals[i + 1]) for i in range(len(fid_hw) - 1)
+                 if (fid_hw[i] - 0.5) * (fid_hw[i + 1] - 0.5) < 0]
+    print(f"  HW fid=0.5 crossings (K interval): {crossings}")
+    fig, axes = plt.subplots(2, 3, figsize=(style.FULL_WIDTH, 4.2)); K = K_vals
     ax = axes[0, 0]
-    ax.plot(K, sweep['E_q0'], 'k-', lw=2.5, label='Exact (Q=0)', zorder=3)
-    ax.plot(K, sweep['E_glob'], 'k:', lw=1.5, alpha=0.4, label='Global min')
-    ax.plot(K, sweep['E_gi'], 'b--', lw=2, label='Gauge-invariant')
-    ax.plot(K, sweep['E_hw'], 'r--', lw=2, label='HW-efficient')
-    ax.set_xlabel('K'); ax.set_ylabel('Energy'); ax.legend(fontsize=8, loc='lower left')
-    _panel(ax, '(a)')
+    ax.plot(K, sweep['E_q0'], 'k-', lw=1.2, label='exact (Q=0)', zorder=3)
+    ax.plot(K, sweep['E_glob'], 'k:', lw=1.0, alpha=0.4, label='global min')
+    ax.plot(K, sweep['E_gi'], 'b--', lw=1.2, label='gauge-inv.')
+    ax.plot(K, sweep['E_hw'], 'r--', lw=1.2, label='HW-eff.')
+    ax.set_xlabel('K'); ax.set_ylabel('Energy'); ax.legend(fontsize=8, loc='lower right')
+    style.panel_label(ax, '(a)')
     ax = axes[0, 1]
-    ax.plot(K, sweep['qt2_gi'], 'b-', lw=2.5, label='GI'); ax.plot(K, sweep['qt2_hw'], 'r-', lw=2.5, label='HW')
-    ax.axhline(0, color='gray', ls=':', lw=1); ax.set_xlabel('K'); ax.set_ylabel(r'$\langle Q_{tot}^2\rangle$')
-    ax.legend(); _panel(ax, '(b)')
+    ax.plot(K, sweep['qt2_gi'], 'b-', lw=1.2, label='GI'); ax.plot(K, sweep['qt2_hw'], 'r-', lw=1.2, label='HW')
+    ax.axhline(0, color='gray', ls=':', lw=1.0); ax.set_xlabel('K'); ax.set_ylabel(r'$\langle Q_{\mathrm{tot}}^2\rangle$')
+    ax.legend(fontsize=8); style.panel_label(ax, '(b)')
     ax = axes[0, 2]
-    ax.plot(K, sweep['fid_gi'], 'b-', lw=2.5, label='GI'); ax.plot(K, sweep['fid_hw'], 'r-', lw=2.5, label='HW')
-    ax.axhline(1.0, color='gray', ls=':', lw=1); ax.set_xlabel('K'); ax.set_ylabel('Fidelity')
-    ax.legend(); _panel(ax, '(c)')
+    ax.plot(K, sweep['fid_gi'], 'b-', lw=1.2, label='GI'); ax.plot(K, sweep['fid_hw'], 'r-', lw=1.2, label='HW')
+    ax.axhline(1.0, color='gray', ls=':', lw=1.0); ax.set_xlabel('K'); ax.set_ylabel('Fidelity')
+    ax.legend(fontsize=8); style.panel_label(ax, '(c)')
     ax = axes[1, 0]
-    ax.plot(K, sweep['n0_gi'], 'b-', lw=2, label='GI'); ax.plot(K, sweep['n0_hw'], 'r--', lw=2, label='HW')
-    ax.set_xlabel('K'); ax.set_ylabel(r'$\langle N_0\rangle$'); ax.legend(); _panel(ax, '(d)')
+    ax.plot(K, sweep['n0_gi'], 'b-', lw=1.2, label='GI'); ax.plot(K, sweep['n0_hw'], 'r--', lw=1.2, label='HW')
+    ax.set_xlabel('K'); ax.set_ylabel(r'$\langle N_0\rangle$'); ax.legend(fontsize=8); style.panel_label(ax, '(d)')
     ax = axes[1, 1]
-    ax.plot(K, sweep['n1_gi'], 'b-', lw=2, label='GI'); ax.plot(K, sweep['n1_hw'], 'r--', lw=2, label='HW')
-    ax.set_xlabel('K'); ax.set_ylabel(r'$\langle N_1\rangle$'); ax.legend(); _panel(ax, '(e)')
+    ax.plot(K, sweep['n1_gi'], 'b-', lw=1.2, label='GI'); ax.plot(K, sweep['n1_hw'], 'r--', lw=1.2, label='HW')
+    ax.set_xlabel('K'); ax.set_ylabel(r'$\langle N_1\rangle$'); ax.legend(fontsize=8); style.panel_label(ax, '(e)')
     ax = axes[1, 2]
     eg = [abs(e - ex) / abs(ex) * 100 if abs(ex) > 0.1 else abs(e - ex) for e, ex in zip(sweep['E_gi'], sweep['E_q0'])]
     eh = [abs(e - ex) / abs(ex) * 100 if abs(ex) > 0.1 else abs(e - ex) for e, ex in zip(sweep['E_hw'], sweep['E_q0'])]
-    ax.semilogy(K, [max(e, 1e-3) for e in eg], 'b-', lw=2.5, label='GI')
-    ax.semilogy(K, [max(e, 1e-3) for e in eh], 'r-', lw=2.5, label='HW')
-    ax.axhline(1.0, color='gray', ls='--', lw=1.5); ax.set_xlabel('K'); ax.set_ylabel('Energy error (%)')
-    ax.legend(); _panel(ax, '(f)')
+    ax.semilogy(K, [max(e, 1e-3) for e in eg], 'b-', lw=1.2, label='GI')
+    ax.semilogy(K, [max(e, 1e-3) for e in eh], 'r-', lw=1.2, label='HW')
+    ax.axhline(1.0, color='gray', ls='--', lw=1.0); ax.set_xlabel('K'); ax.set_ylabel('Energy error (%)')
+    ax.legend(fontsize=8); style.panel_label(ax, '(f)')
     plt.tight_layout()
     out_path = os.path.join(FIG_DIR, "fig3_ksweep.png")
     plt.savefig(out_path)
