@@ -11,20 +11,24 @@ a hardware-efficient (HW) baseline built from generic single-qubit rotations
 and a CNOT ladder, which has no such symmetry protection and can leak
 population into unphysical charge sectors.
 
-The central methodological contribution is a train-noisy VQE pipeline: COBYLA
-optimizes directly against an actual noisy density-matrix circuit (a
-two-qubit depolarizing channel after every CNOT, plus a per-qubit bit-flip
-SPAM channel before readout, both via `qiskit-aer`'s
-`AerSimulator(method="density_matrix")`), instead of the more common
-train-noiseless-then-evaluate-noisy shortcut or a post-hoc analytic
-contraction of the exact energy. That distinction matters because it lets the
-three effects usually conflated in NISQ-era VQE studies be pulled apart and
-attributed separately: how much of a result's distortion comes from ansatz
-expressibility (can the ansatz even represent the target state, at any noise
-level), how much from symmetry protection (does the ansatz's own structure
-keep it in the physical sector, or does it need a penalty term), and how much
-is genuinely attributable to hardware noise once the first two are controlled
-for.
+The code implements a train-noisy VQE pipeline: COBYLA optimizes directly
+against an actual noisy density-matrix circuit, with a two-qubit depolarizing
+channel after every CNOT and a per-qubit bit-flip SPAM channel before readout
+(both via `qiskit-aer`'s `AerSimulator(method="density_matrix")`), rather than
+against a noiseless energy or an analytic contraction of the exact energy.
+This lets three effects usually conflated in NISQ-era VQE studies be
+separated: ansatz expressibility (can the ansatz represent the target state
+at any noise level), symmetry protection (does the ansatz's structure keep it
+in the physical sector, or does it need a penalty term), and hardware noise.
+
+The finding on the noise question is a negative one. In the *same* local
+channel, optimizing inside the noisy loop and evaluating a noiselessly
+optimized state under that channel give statistically indistinguishable
+transition signatures (`experiments/posthoc_local_control.py`,
+`posthoc_local_ensemble.py`; see below). The gap between the in-loop results
+and the analytic post-hoc estimate comes from the noise model, global
+contraction toward the sector mean versus per-gate local noise, not from
+training inside the loop.
 
 This repository also carries a seven-round audit trail of that analysis:
 `results/SUMMARY.md`'s Corrections section documents every methodological bug
@@ -309,9 +313,12 @@ full reasoning and audit history behind each one:
 - **In-loop vs post-hoc noisy estimate (N=3).** The mean relative gap
   between the in-loop-trained noisy energy and the post-hoc analytic
   contraction, in the central phase (`|K|<=4`), grows from 5.8% at `p=0.01`
-  to 42.8% at `p=0.05`. The post-hoc contraction is not a substitute for
-  actually training against the noisy circuit; the gap widens with noise
-  strength rather than staying roughly constant.
+  to 42.8% at `p=0.05`. This is a gap between the local-channel energy and
+  the global analytic contraction, i.e. a difference in noise model: the
+  same-channel control (`results/posthoc_local_ensemble_N3_L3.json`) shows that
+  evaluating a noiselessly optimized state in the same local channel is
+  statistically indistinguishable from optimizing inside the loop. The gap
+  widens with noise strength rather than staying roughly constant.
 - **Kink suppression (Round 7, bidirectional-hysteresis check, N=3, L=3,
   p=0.01).** 16.2% raw suppression of the transition's slope drop under
   noise (12.3% before the Round-9 fix), reported alongside the paper's Section
@@ -319,14 +326,16 @@ full reasoning and audit history behind each one:
   `1.082` (108.2%) on the ordered branch, from the slope-mixture solve
   `w_eff = (dE_mix/dK - dE_inloop/dK) / (dE_mix/dK - dE_exact/dK)` (both in
   `[0.91, 1.10]`). Both branches retain essentially the full exact slope,
-  far above the passive-mixing `w_eff = 0.732`. (Round 6's baseline-adjusted -27.9% figure
+  far above the passive-mixing `w_eff = 0.732`. The same-channel control gives a
+  post-hoc median suppression of 9.8% (5-95%: -12.0 to 36.9%), which contains
+  in-loop's 16.2%, whereas global contraction predicts 26.77%. (Round 6's baseline-adjusted -27.9% figure
   is withdrawn -- it double-counted the mixing correction; see
   `results/SUMMARY.md` Corrections, Round 7.)
 - **In-loop ZNE boundary residuals.** 0.84, 1.20, and 4.02 (energy units) at
   `p=0.01, 0.02, 0.05` respectively, versus a post-hoc reference of 3.8,
-  10.5, and 33 at the same three noise strengths: in-loop training combined
-  with linear Richardson extrapolation removes most of the residual error
-  the post-hoc estimate leaves behind.
+  10.5, and 33 at the same three noise strengths. The two columns differ in
+  noise model (per-gate local channels versus global contraction) as well as
+  in protocol, so the reduction factor is not attributable to re-optimization.
 - **N=4 noiseless restart-budget control.** Mean 0.12% error at the three
   K-points matched to `noisy_N4_spot.csv`'s own K grid, with the same
   restart budget. This confirms the degradation reported there is genuinely
@@ -367,9 +376,10 @@ results; outputs go to new files):
 | `experiments/diagnose_build_H_full_bug.py` | reproduces the operator bug (exact ground state scored through `NoisyEvaluator`); passes after the fix | stdout |
 | `experiments/_compare_postfix.py`, `experiments/_run_postfix_batch*.sh`, `experiments/_run_exp03_exp12.sh` | compare pre- and post-fix CSVs; the batch runners used for the reruns | stdout / `results/postfix_run_logs/` |
 
-The same-channel control in `posthoc_local_*.json` is highly theta*-dependent,
-so read the ensemble summary rather than any single draw when comparing
-in-loop and post-hoc results.
+Same-channel conclusion: in-loop and post-hoc are statistically
+indistinguishable in the same local channel (post-hoc kink suppression median
+9.8%, 5-95% range -12.0 to 36.9%, versus in-loop 16.16%); the difference from
+the analytic estimate (26.77%) is the noise model, not the protocol.
 
 ### IBM hardware (ibm_marrakesh), N=3, L=2, K=0, fixed theta
 
